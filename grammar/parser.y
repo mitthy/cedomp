@@ -3,6 +3,8 @@
     #include <vector>
     #include <map>
     #include <iostream>
+    #include "Semantic/VarAssign.h"
+    #include "AST/AST.h"
     extern int yylex();
     extern int yyparse();
     extern void yyerror(const char* s, ...);
@@ -19,6 +21,10 @@
     std::vector<void*>* listtype;
     std::map<std::string, void*>* maptype;
     char* id;
+    std::vector<std::string>* typevarlist;
+    std::vector<Cedomp::AST::ExpressionNode*>* typeassignlist;
+    std::vector<Cedomp::AST::AssignVariableNode*>* typevarassign;
+    Cedomp::AST::ExpressionNode* typeexpr;
 }
 
 %token T_NL
@@ -27,6 +33,10 @@
 %token T_DEF T_END T_RETURN T_FOR T_IF T_ELSE
 %token T_AND T_XOR T_OR T_MOD T_NOT T_EQUALS T_DIFFERENT T_GREATER_EQUAL T_LESS_EQUAL T_GREATER T_LESS T_PLUS T_STAR T_SLASH T_MINUS
 
+%type<typeexpr> expr
+%type<typevarlist> varlist
+%type<typeassignlist> assignlist
+%type<typevarassign> varassign
 %type<strtype> T_STRING
 %type<inttype> T_INT
 %type<id> T_ID
@@ -202,11 +212,11 @@ T_STRING
 {
 }
 |
-T_MAP
+T_MAP T_LEFT_PAR T_RIGHT_PAR
 {
 }
 |
-T_LIST
+T_LIST T_LEFT_PAR T_RIGHT_PAR
 {
 }
 |
@@ -289,31 +299,61 @@ expr T_LESS expr
 T_LEFT_PAR expr T_RIGHT_PAR
 {
 }
+|
+functioncall
+{
+}
+;
+
+functioncall:
+T_ID T_LEFT_PAR arglist T_RIGHT_PAR
+{
+}
+|
+T_ID T_LEFT_PAR T_RIGHT_PAR
+{
+}
+;
+
+arglist:
+arglist T_COMMA expr
+{
+}
+|
+expr
+{
+}
 ;
 
 varassign:
 varlist T_ASSIGN assignlist
 {
+    $$ = Cedomp::Semantic::AssignVariable($1, $3);
+    cout << $$->size();
 }
 ;
 
 varlist:
 varlist T_COMMA T_ID
 {
+    $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3));
 }
 |
 T_ID
 {
+    $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1));
 }
 ;
 
 assignlist:
 assignlist T_COMMA expr
 {
+    $$ = Cedomp::Semantic::ParseAssignExpressions($1, $3);
 }
 |
 expr
 {
+    $$ = Cedomp::Semantic::ParseAssignExpressions(nullptr, $1);
 }
 ;
 

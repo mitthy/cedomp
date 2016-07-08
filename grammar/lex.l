@@ -5,6 +5,8 @@
     #include <map>
     #include <iostream>
     #include <vector>
+    #include "Semantic/VarAssign.h"
+    #include "AST/AST.h"
     #define YY_DECL int yylex()
     #include "parser.tab.h"
     extern int yylineno;
