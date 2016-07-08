@@ -77,6 +77,10 @@ bool Type::isCompatible( const TypeCode& typeCode1, const TypeCode& typeCode2 )
 	{
 		return false;
 	}
+	if (typeCode1 == typeCode2)
+	{
+		return true;
+	}
 	if (compatibilityMap[typeCode1].find(typeCode2)
 			== compatibilityMap[typeCode1].end())
 	{

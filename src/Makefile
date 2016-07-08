@@ -1,5 +1,6 @@
 NAME=../cedomp
-SRC=main.cpp Scope/Scope.cpp Semantic/VarAssign.cpp Type/Types.cpp Exceptions/VarAssignExceptions.cpp AST/AST.cpp
+SRC=main.cpp Scope/Scope.cpp Semantic/VarAssign.cpp Type/Types.cpp Exceptions/VarAssignExceptions.cpp AST/AST.cpp \
+	Exceptions/TypeExceptions.cpp
 BISON=bison
 FLEX=flex
 CC=g++

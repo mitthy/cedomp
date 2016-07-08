@@ -11,6 +11,8 @@
 #include <vector>
 #include "AST/AST.h"
 #include "Exceptions/VarAssignExceptions.h"
+#include "Exceptions/TypeExceptions.h"
+#include "Type/Types.h"
 
 using VarScope = Cedomp::Scope::Scope;
 using FunScope = Cedomp::Scope::FunctionScope;
@@ -63,8 +65,18 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 	auto valBeg = values->begin();
 	for (; idBeg != idEnd || valBeg != valEnd; ++idBeg, ++valBeg)
 	{
-		//Scope::getScope().addToScope(*idBeg, (*valBeg)->getTypeCode());
-		VarScope::getScope().addToScope(*idBeg, 0);
+		auto varSymbol = VarScope::getScope().searchCurrentScope(*idBeg);
+		if(varSymbol)
+		{
+			if(!Cedomp::Type::Type::isCompatible(varSymbol->type, (*valBeg)->getTypeCode()))
+			{
+				throw IncompatibleTypeException(varSymbol->type, (*valBeg)->getTypeCode());
+			}
+		}
+		else
+		{
+			VarScope::getScope().addToScope(*idBeg, (*valBeg)->getTypeCode());
+		}
 		result->push_back(new AssignVariableNode(*idBeg, *valBeg));
 	}
 	delete ids;
