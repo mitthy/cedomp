@@ -34,7 +34,7 @@ std::string WrongVarNumberException::Error()
 	std::string exprAmountStr = std::to_string(exprAmount);
 	std::string result = "assigning ";
 	result += exprAmountStr;
-	result += " to ";
+	result += " expressions to ";
 	result += varAmountStr;
 	result += " variables";
 	return result;

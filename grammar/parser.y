@@ -11,6 +11,7 @@
     extern void yyerror(const char* s, ...);
     using std::cout;
     using std::endl;
+
 %}
 
 
@@ -78,6 +79,10 @@ T_NL
 }
 |
 statements T_NL
+{
+}
+|
+error T_NL
 {
 }
 ;
@@ -329,13 +334,21 @@ expr
 varassign:
 varlist T_ASSIGN assignlist
 {
-    try
+    if($1 == nullptr || $3 == nullptr)
     {
-        $$ = Cedomp::Semantic::AssignVariable($1, $3);
+        $$ = nullptr;
     }
-    catch(Cedomp::Exceptions::CedompException& e)
+    else
     {
-        e.PrintSemanticError();
+        try
+        {
+            $$ = Cedomp::Semantic::AssignVariable($1, $3);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
     }
 }
 ;
@@ -343,49 +356,81 @@ varlist T_ASSIGN assignlist
 varlist:
 varlist T_COMMA T_ID
 {
-    try
+    if($1 == nullptr || $3 == nullptr)
     {
-        $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3));
+        $$ = nullptr;
     }
-    catch(Cedomp::Exceptions::CedompException& e)
+    else
     {
-        e.PrintSemanticError();
+        try
+        {
+            $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3));
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
     }
 }
 |
 T_ID
 {
-    try
+    if($1 == nullptr)
     {
-        $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1));
+        $$ = nullptr;
     }
-    catch(Cedomp::Exceptions::CedompException& e)
+    else
     {
-        e.PrintSemanticError();
+        try
+        {
+            $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1));
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
     }
 }
 |
 varlist T_COMMA T_ID T_LEFT_BRACKET expr T_RIGHT_BRACKET
 {
-    try
+    if($1 == nullptr || $3 == nullptr || $5 == nullptr)
     {
-        $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3), $5);
+        $$ = nullptr;
     }
-    catch(Cedomp::Exceptions::CedompException& e)
+    else
     {
-        e.PrintSemanticError();
+        try
+        {
+            $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3), $5);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
     }
 }
 |
 T_ID T_LEFT_BRACKET expr T_RIGHT_BRACKET
 {
-    try
+    if($3 == nullptr || $1 == nullptr)
     {
-        $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1), $3);
+        $$ = nullptr;
     }
-    catch(Cedomp::Exceptions::CedompException& e)
+    else
     {
-        e.PrintSemanticError();
+        try
+        {
+            $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1), $3);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
     }
 }
 ;
@@ -393,25 +438,41 @@ T_ID T_LEFT_BRACKET expr T_RIGHT_BRACKET
 assignlist:
 assignlist T_COMMA expr
 {
-    try
+    if($1 == nullptr || $3 == nullptr)
     {
-        $$ = Cedomp::Semantic::ParseAssignExpressions($1, $3);
+        $$ = nullptr;
     }
-    catch(Cedomp::Exceptions::CedompException& e)
+    else
     {
-        e.PrintSemanticError();
+        try
+        {
+            $$ = Cedomp::Semantic::ParseAssignExpressions($1, $3);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
     }
 }
 |
 expr
 {
-    try
+    if($1 == nullptr)
     {
-        $$ = Cedomp::Semantic::ParseAssignExpressions(nullptr, $1);
+        $$ = nullptr;
     }
-    catch(Cedomp::Exceptions::CedompException& e)
+    else
     {
-        e.PrintSemanticError();
+        try
+        {
+            $$ = Cedomp::Semantic::ParseAssignExpressions(nullptr, $1);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
     }
 }   
 ;

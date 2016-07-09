@@ -14,6 +14,11 @@
 #include "Exceptions/TypeExceptions.h"
 #include "Type/Types.h"
 #include <iostream>
+#include <memory>
+
+/*
+ * We use unique_ptr inside functions to avoid leaks.
+ */
 
 using VarScope = Cedomp::Scope::Scope;
 using FunScope = Cedomp::Scope::FunctionScope;
@@ -24,6 +29,7 @@ using namespace Cedomp::Exceptions;
 std::vector<VarNameIndex>* Cedomp::Semantic::ParseVarNames(
 		std::vector<VarNameIndex>* previous, std::string varName )
 {
+	std::unique_ptr<std::vector<VarNameIndex>> previousRAII(previous);
 	FunScope& fscope = FunScope::getScope();
 	if (fscope.searchScope(varName))
 	{
@@ -39,6 +45,7 @@ std::vector<VarNameIndex>* Cedomp::Semantic::ParseVarNames(
 	varAssgn.index = nullptr;
 	varAssgn.varName = varName;
 	result->push_back(varAssgn);
+	previousRAII.release();
 	return result;
 }
 
@@ -46,6 +53,8 @@ std::vector<VarNameIndex>* Cedomp::Semantic::ParseVarNames(
 		std::vector<VarNameIndex>* previous, std::string varName,
 		AST::ExpressionNode* index )
 {
+	std::unique_ptr<std::vector<VarNameIndex>> previousRAII(previous);
+	std::unique_ptr<AST::ExpressionNode> indexRAII(index);
 	FunScope& fscope = FunScope::getScope();
 	if (fscope.searchScope(varName))
 	{
@@ -80,25 +89,32 @@ std::vector<VarNameIndex>* Cedomp::Semantic::ParseVarNames(
 	varAssgn.index = index;
 	varAssgn.varName = varName;
 	result->push_back(varAssgn);
+	previousRAII.release();
+	indexRAII.release();
 	return result;
 }
 
 std::vector<ExpressionNode*>* Cedomp::Semantic::ParseAssignExpressions(
 		std::vector<ExpressionNode*>* previous, ExpressionNode* expr )
 {
+	std::unique_ptr<std::vector<ExpressionNode*>> previousRAII(previous);
+	std::unique_ptr<ExpressionNode> exprRAII(expr);
 	std::vector<ExpressionNode*>* result = previous;
 	if (!result)
 	{
 		result = new std::vector<ExpressionNode*>();
 	}
 	result->push_back(expr);
+	previousRAII.release();
+	exprRAII.release();
 	return result;
 }
 
 std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
-		const std::vector<VarNameIndex>* const ids,
-		const std::vector<ExpressionNode*>* const values )
+		std::vector<VarNameIndex>* ids, std::vector<ExpressionNode*>* values )
 {
+	std::unique_ptr<std::vector<VarNameIndex>> idsRAII(ids);
+	std::unique_ptr<std::vector<ExpressionNode*>> valuesRAII(values);
 	if (ids->size() != values->size())
 	{
 		throw WrongVarNumberException(ids->size(), values->size());
@@ -111,7 +127,8 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 	auto valBeg = values->begin();
 	for (; idBeg != idEnd || valBeg != valEnd; ++idBeg, ++valBeg)
 	{
-		auto varSymbol = VarScope::getScope().searchCurrentScope(idBeg->varName);
+		auto varSymbol = VarScope::getScope().searchCurrentScope(
+				idBeg->varName);
 		if (varSymbol)
 		{
 			if (!Cedomp::Type::Type::isCompatible(varSymbol->type,
@@ -123,13 +140,12 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 		}
 		else
 		{
-			VarScope::getScope().addToScope(idBeg->varName, (*valBeg)->getTypeCode());
+			VarScope::getScope().addToScope(idBeg->varName,
+					(*valBeg)->getTypeCode());
 		}
 		//Change to support indexing
 		result->push_back(new AssignVariableNode(idBeg->varName, *valBeg));
 	}
-	delete ids;
-	delete values;
 	return result;
 }
 

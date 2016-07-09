@@ -31,8 +31,8 @@ namespace Cedomp
 				std::vector<AST::ExpressionNode*>*, AST::ExpressionNode* );
 
 		std::vector<AST::AssignVariableNode*>* AssignVariable(
-				const std::vector<VarNameIndex>* const ids,
-				const std::vector<AST::ExpressionNode*>* const values );
+				std::vector<VarNameIndex>* ids,
+				std::vector<AST::ExpressionNode*>* values );
 
 	}
 }
