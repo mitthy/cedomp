@@ -13,15 +13,30 @@ TypeCode Type::last = BaseType::TEND;
 /**
  * This should be altered everytime a new base time is introduced to the language
  */
-std::map<std::string, TypeCode> createTypeMap()
+std::set<std::string> createTypeSet()
 {
-	std::map<std::string, TypeCode> ret;
-	ret["integer"] = BaseType::TYPEINT;
-	ret["float"] = BaseType::TYPEFLOAT;
-	ret["bool"] = BaseType::TYPEBOOL;
-	ret["function"] = BaseType::TYPEFUNCTION;
-	ret["map"] = BaseType::TYPEMAP;
-	ret["list"] = BaseType::TYPELIST;
+	std::set<std::string> ret;
+	ret.insert("integer");
+	ret.insert("float");
+	ret.insert("bool");
+	ret.insert("function");
+	ret.insert("map");
+	ret.insert("list");
+	return ret;
+}
+
+/**
+ * This should be altered everytime a new base time is introduced to the language
+ */
+std::map<TypeCode, std::string> createTypeMap()
+{
+	std::map<TypeCode, std::string> ret;
+	ret[TYPEINT] = "integer";
+	ret[TYPEFLOAT] = "float";
+	ret[TYPEBOOL] = "bool";
+	ret[TYPEFUNCTION] = "function";
+	ret[TYPEMAP] = "map";
+	ret[TYPELIST] = "list";
 	return ret;
 }
 
@@ -42,24 +57,33 @@ std::map<TypeCode, std::set<TypeCode>> createCompatibilityMap()
 	return ret;
 }
 
-std::map<std::string, TypeCode> Type::typeMap = createTypeMap();
+std::map<TypeCode, std::string> Type::typeMap = createTypeMap();
 
 std::map<TypeCode, std::set<TypeCode>> Type::compatibilityMap =
 		createCompatibilityMap();
 
+std::set<std::string> Type::typeName = createTypeSet();
+
 TypeCode Type::getTypeCode( const std::string& typeName )
 {
-	if (typeMap.find(typeName) == typeMap.end())
+	for(const auto& pair : typeMap)
 	{
-		return BaseType::TYPEERROR;
+		if(pair.second == typeName)
+		{
+			return pair.first;
+		}
 	}
-	return typeMap[typeName];
+	return BaseType::TYPEERROR;
 
 }
 
 void Type::registerType( const std::string& typeName )
 {
-	typeMap[typeName] = ++last;
+	if (Type::typeName.find(typeName) == Type::typeName.end())
+	{
+		typeMap[++last] = typeName;
+		compatibilityMap[last] = std::set<TypeCode>();
+	}
 }
 
 void Type::registerCompatible( const TypeCode& typeCode1,
@@ -87,4 +111,18 @@ bool Type::isCompatible( const TypeCode& typeCode1, const TypeCode& typeCode2 )
 		return false;
 	}
 	return true;
+}
+
+bool Type::isBaseType( const TypeCode& typeCode )
+{
+	return typeCode > BaseType::TYPEERROR && typeCode < BaseType::TEND;
+}
+
+std::string Type::getTypeName( const TypeCode& typeCode )
+{
+	if(typeCode == BaseType::TYPEERROR || typeMap.find(typeCode) == typeMap.end())
+	{
+		return "unknown";
+	}
+	return typeMap[typeCode];
 }

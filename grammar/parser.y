@@ -5,6 +5,7 @@
     #include <iostream>
     #include "Semantic/VarAssign.h"
     #include "AST/AST.h"
+    #include "Exceptions/CedompException.h"
     extern int yylex();
     extern int yyparse();
     extern void yyerror(const char* s, ...);
@@ -21,7 +22,7 @@
     std::vector<void*>* listtype;
     std::map<std::string, void*>* maptype;
     char* id;
-    std::vector<std::string>* typevarlist;
+    std::vector<Cedomp::Semantic::VarNameIndex>* typevarlist;
     std::vector<Cedomp::AST::ExpressionNode*>* typeassignlist;
     std::vector<Cedomp::AST::AssignVariableNode*>* typevarassign;
     Cedomp::AST::ExpressionNode* typeexpr;
@@ -328,33 +329,91 @@ expr
 varassign:
 varlist T_ASSIGN assignlist
 {
-    $$ = Cedomp::Semantic::AssignVariable($1, $3);
-    cout << $$->size();
+    try
+    {
+        $$ = Cedomp::Semantic::AssignVariable($1, $3);
+    }
+    catch(Cedomp::Exceptions::CedompException& e)
+    {
+        e.PrintSemanticError();
+    }
 }
 ;
 
 varlist:
 varlist T_COMMA T_ID
 {
-    $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3));
+    try
+    {
+        $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3));
+    }
+    catch(Cedomp::Exceptions::CedompException& e)
+    {
+        e.PrintSemanticError();
+    }
 }
 |
 T_ID
 {
-    $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1));
+    try
+    {
+        $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1));
+    }
+    catch(Cedomp::Exceptions::CedompException& e)
+    {
+        e.PrintSemanticError();
+    }
+}
+|
+varlist T_COMMA T_ID T_LEFT_BRACKET expr T_RIGHT_BRACKET
+{
+    try
+    {
+        $$ = Cedomp::Semantic::ParseVarNames($1, std::string($3), $5);
+    }
+    catch(Cedomp::Exceptions::CedompException& e)
+    {
+        e.PrintSemanticError();
+    }
+}
+|
+T_ID T_LEFT_BRACKET expr T_RIGHT_BRACKET
+{
+    try
+    {
+        $$ = Cedomp::Semantic::ParseVarNames(nullptr, std::string($1), $3);
+    }
+    catch(Cedomp::Exceptions::CedompException& e)
+    {
+        e.PrintSemanticError();
+    }
 }
 ;
 
 assignlist:
 assignlist T_COMMA expr
 {
-    $$ = Cedomp::Semantic::ParseAssignExpressions($1, $3);
+    try
+    {
+        $$ = Cedomp::Semantic::ParseAssignExpressions($1, $3);
+    }
+    catch(Cedomp::Exceptions::CedompException& e)
+    {
+        e.PrintSemanticError();
+    }
 }
 |
 expr
 {
-    $$ = Cedomp::Semantic::ParseAssignExpressions(nullptr, $1);
-}
+    try
+    {
+        $$ = Cedomp::Semantic::ParseAssignExpressions(nullptr, $1);
+    }
+    catch(Cedomp::Exceptions::CedompException& e)
+    {
+        e.PrintSemanticError();
+    }
+}   
 ;
 
 %%

@@ -15,14 +15,23 @@ namespace Cedomp
 	namespace Semantic
 	{
 
-		std::vector<std::string>* ParseVarNames(
-				std::vector<std::string>* previous, std::string varName );
+		struct VarNameIndex
+		{
+			AST::ExpressionNode* index;
+			std::string varName;
+		};
+
+		std::vector<VarNameIndex>* ParseVarNames(
+				std::vector<VarNameIndex>* previous, std::string varName );
+
+		std::vector<VarNameIndex>* ParseVarNames(
+						std::vector<VarNameIndex>* previous, std::string varName, AST::ExpressionNode* index );
 
 		std::vector<AST::ExpressionNode*>* ParseAssignExpressions(
 				std::vector<AST::ExpressionNode*>*, AST::ExpressionNode* );
 
 		std::vector<AST::AssignVariableNode*>* AssignVariable(
-				const std::vector<std::string>* const ids,
+				const std::vector<VarNameIndex>* const ids,
 				const std::vector<AST::ExpressionNode*>* const values );
 
 	}

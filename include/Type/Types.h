@@ -12,6 +12,10 @@
 #include <map>
 #include <set>
 
+/**
+ * TODO: Add set of supported operations for each type.
+ */
+
 namespace Cedomp
 {
 	namespace Type
@@ -19,13 +23,18 @@ namespace Cedomp
 
 		typedef unsigned long TypeCode;
 
+		/////////////////////////////////////////////////////////////////////////////////////////////
+		//Change BaseType to be read from a file. Changes to the initialization of the static members
+		//should be made accordingly
+		/////////////////////////////////////////////////////////////////////////////////////////////
+
 		/**
 		 * Should this enumeration be modified to add more base types to the language, it should
 		 * always end with TEND
 		 */
 		enum BaseType
 		{
-			TYPEERROR, TYPEINT, TYPEFLOAT, TYPEBOOL, TYPEFUNCTION, TYPEMAP, TYPELIST, TEND
+			TYPEERROR, TYPEINT, TYPEFLOAT, TYPEBOOL, TYPEFUNCTION, TYPEMAP, TYPELIST, TYPESTRING, TEND
 		};
 
 		class Type
@@ -76,9 +85,15 @@ namespace Cedomp
 			static bool isCompatible( const TypeCode& typeCode1,
 					const TypeCode& typeCode2 );
 
+			static bool isBaseType (const TypeCode& typeCode );
+
+			static std::string getTypeName( const TypeCode& typeCode );
+
 		private:
 
-			static std::map<std::string, TypeCode> typeMap;
+			static std::set<std::string> typeName;
+
+			static std::map<TypeCode, std::string> typeMap;
 
 			static std::map<TypeCode, std::set<TypeCode>> compatibilityMap;
 

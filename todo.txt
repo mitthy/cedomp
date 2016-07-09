@@ -1,0 +1,9 @@
+Definir um macro que faça as seguintes ações:
+
+Coloque uma chamada de função dentro de um try catch e retorne para o $$.
+Dentro do catch, printe a exceção e coloque o valor de $$ para null.
+
+Verifique se o valor de alguma coisa for null antes de chamar a função específica.
+Se for null, decidir ação a tomar.
+
+
