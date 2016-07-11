@@ -112,6 +112,174 @@ namespace Cedomp
 			std::string varName;
 		};
 
+		class BinaryOperationNode: public ExpressionNode
+		{
+		public:
+			BinaryOperationNode( Cedomp::Type::TypeCode type,
+					ExpressionNode* lhs, ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printExpressionValue() const;
+			virtual void printOpName() const = 0;
+			std::unique_ptr<ExpressionNode> lhs;
+			std::unique_ptr<ExpressionNode> rhs;
+			bool coercion;
+		};
+
+		class ModNode: public BinaryOperationNode
+		{
+		public:
+			ModNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class AdditionNode: public BinaryOperationNode
+		{
+		public:
+			AdditionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class SubtractionNode: public BinaryOperationNode
+		{
+		public:
+			SubtractionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class MultiplicationNode: public BinaryOperationNode
+		{
+		public:
+			MultiplicationNode( Cedomp::Type::TypeCode type,
+					ExpressionNode* lhs, ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class DivisionNode: public BinaryOperationNode
+		{
+		public:
+			DivisionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class EqualsNode: public BinaryOperationNode
+		{
+		public:
+			EqualsNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class DifferentNode: public BinaryOperationNode
+		{
+		public:
+			DifferentNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class GreaterNode: public BinaryOperationNode
+		{
+		public:
+			GreaterNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class LessNode: public BinaryOperationNode
+		{
+		public:
+			LessNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class GreaterEqualNode: public BinaryOperationNode
+		{
+		public:
+			GreaterEqualNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class LessEqualNode: public BinaryOperationNode
+		{
+		public:
+			LessEqualNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class AndNode: public BinaryOperationNode
+		{
+		public:
+			AndNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class OrNode: public BinaryOperationNode
+		{
+		public:
+			OrNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class XorNode: public BinaryOperationNode
+		{
+		public:
+			XorNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+					ExpressionNode* rhs, bool coercion );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class UnaryOperationNode: public ExpressionNode
+		{
+		public:
+			UnaryOperationNode( Cedomp::Type::TypeCode type,
+					ExpressionNode* expr );
+		protected:
+			virtual void printExpressionValue() const;
+			virtual void printOpName() const = 0;
+			std::unique_ptr<ExpressionNode> expr;
+		};
+
+		class UnaryMinusNode: public UnaryOperationNode
+		{
+		public:
+			UnaryMinusNode( Cedomp::Type::TypeCode type,
+					ExpressionNode* expr );
+		protected:
+			virtual void printOpName() const;
+		};
+
+		class NotNode: public UnaryOperationNode
+		{
+		public:
+			NotNode( Cedomp::Type::TypeCode type,
+					ExpressionNode* expr );
+		protected:
+			virtual void printOpName() const;
+		};
+
 	}
 }
 #endif /* EXPRESSIONNODE_H_ */

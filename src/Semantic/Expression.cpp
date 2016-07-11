@@ -110,6 +110,7 @@ ExpressionNode* Cedomp::Semantic::ComputeMod( ExpressionNode* left,
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -123,7 +124,7 @@ ExpressionNode* Cedomp::Semantic::ComputeMod( ExpressionNode* left,
 				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
 						right->getTypeCode());
 			}
-			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -132,6 +133,7 @@ ExpressionNode* Cedomp::Semantic::ComputeMod( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new ModNode(checker, left, right, coercion);
 }
 
 ExpressionNode* Cedomp::Semantic::ComputeAddition( ExpressionNode* left,
@@ -141,6 +143,7 @@ ExpressionNode* Cedomp::Semantic::ComputeAddition( ExpressionNode* left,
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), "+",
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -154,7 +157,7 @@ ExpressionNode* Cedomp::Semantic::ComputeAddition( ExpressionNode* left,
 				throw BinaryOperationNotSupported("+", left->getTypeCode(),
 						right->getTypeCode());
 			}
-			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -163,6 +166,7 @@ ExpressionNode* Cedomp::Semantic::ComputeAddition( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new AdditionNode(checker, left, right, coercion);
 
 }
 
@@ -174,6 +178,7 @@ ExpressionNode* Cedomp::Semantic::ComputeSubtraction( ExpressionNode* left,
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -188,6 +193,7 @@ ExpressionNode* Cedomp::Semantic::ComputeSubtraction( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -196,6 +202,7 @@ ExpressionNode* Cedomp::Semantic::ComputeSubtraction( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new SubtractionNode(checker, left, right, coercion);
 }
 
 ExpressionNode* Cedomp::Semantic::ComputeMultiplication( ExpressionNode* left,
@@ -206,6 +213,7 @@ ExpressionNode* Cedomp::Semantic::ComputeMultiplication( ExpressionNode* left,
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -220,6 +228,7 @@ ExpressionNode* Cedomp::Semantic::ComputeMultiplication( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -228,6 +237,7 @@ ExpressionNode* Cedomp::Semantic::ComputeMultiplication( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new MultiplicationNode(checker, left, right, coercion);
 }
 
 ExpressionNode* Cedomp::Semantic::ComputeDivision( ExpressionNode* left,
@@ -238,6 +248,7 @@ ExpressionNode* Cedomp::Semantic::ComputeDivision( ExpressionNode* left,
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -252,6 +263,7 @@ ExpressionNode* Cedomp::Semantic::ComputeDivision( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -260,21 +272,32 @@ ExpressionNode* Cedomp::Semantic::ComputeDivision( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new DivisionNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeUnaryMinus( ::ExpressionNode* val )
+ExpressionNode* Cedomp::Semantic::ComputeUnaryMinus( ExpressionNode* val )
 {
-
+	std::string opName("-");
+	auto& operation = Cedomp::Type::Operation::getInstance();
+	Cedomp::Type::TypeCode checker;
+	operation.getReturnUnaryType(val->getTypeCode(), opName, checker);
+	if (checker == Cedomp::Type::BaseType::TYPEERROR)
+	{
+		throw UnaryOperationNotSupported(opName, val->getTypeCode());
+	}
+	//Return node here
+	return new UnaryMinusNode(checker, val);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeGreaterThan( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeGreaterThan( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName(">");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -289,6 +312,7 @@ ExpressionNode* Cedomp::Semantic::ComputeGreaterThan( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -297,16 +321,18 @@ ExpressionNode* Cedomp::Semantic::ComputeGreaterThan( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new GreaterNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeEquals( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeEquals( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName("==");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -321,6 +347,7 @@ ExpressionNode* Cedomp::Semantic::ComputeEquals( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -329,16 +356,18 @@ ExpressionNode* Cedomp::Semantic::ComputeEquals( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new EqualsNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeDifferent( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeDifferent( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName("!=");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -353,6 +382,7 @@ ExpressionNode* Cedomp::Semantic::ComputeDifferent( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -361,16 +391,18 @@ ExpressionNode* Cedomp::Semantic::ComputeDifferent( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new DifferentNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeGreaterEquals( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeGreaterEquals( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName(">=");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -385,6 +417,7 @@ ExpressionNode* Cedomp::Semantic::ComputeGreaterEquals( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -393,16 +426,18 @@ ExpressionNode* Cedomp::Semantic::ComputeGreaterEquals( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new GreaterEqualNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeAnd( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeAnd( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName("and");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -417,6 +452,7 @@ ExpressionNode* Cedomp::Semantic::ComputeAnd( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -425,16 +461,18 @@ ExpressionNode* Cedomp::Semantic::ComputeAnd( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new AndNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeXor( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeXor( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName("xor");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -449,6 +487,7 @@ ExpressionNode* Cedomp::Semantic::ComputeXor( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -456,17 +495,19 @@ ExpressionNode* Cedomp::Semantic::ComputeXor( ExpressionNode* left,
 					right->getTypeCode());
 		}
 	}
+	return new XorNode(checker, left, right, coercion);
 	//Return new node here.
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeOr( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeOr( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName("or");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -481,6 +522,7 @@ ExpressionNode* Cedomp::Semantic::ComputeOr( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -489,21 +531,32 @@ ExpressionNode* Cedomp::Semantic::ComputeOr( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new OrNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeNot( ExpressionNode* val )
+ExpressionNode * Cedomp::Semantic::ComputeNot( ExpressionNode * val )
 {
-
+	std::string opName("not");
+	auto& operation = Cedomp::Type::Operation::getInstance();
+	Cedomp::Type::TypeCode checker;
+	operation.getReturnUnaryType(val->getTypeCode(), opName, checker);
+	if (checker == Cedomp::Type::BaseType::TYPEERROR)
+	{
+		throw UnaryOperationNotSupported(opName, val->getTypeCode());
+	}
+	//Return node here
+	return new NotNode(checker, val);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeLessEqual( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeLessEqual( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName("<=");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -518,6 +571,7 @@ ExpressionNode* Cedomp::Semantic::ComputeLessEqual( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -526,16 +580,18 @@ ExpressionNode* Cedomp::Semantic::ComputeLessEqual( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new LessEqualNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeLess( ExpressionNode* left,
-		ExpressionNode* right )
+ExpressionNode * Cedomp::Semantic::ComputeLess( ExpressionNode * left,
+		ExpressionNode * right )
 {
 	std::string opName("<");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
+	bool coercion = false;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -550,6 +606,7 @@ ExpressionNode* Cedomp::Semantic::ComputeLess( ExpressionNode* left,
 						right->getTypeCode());
 			}
 			//Coercion successful
+			coercion = true;
 		}
 		else
 		{
@@ -558,9 +615,10 @@ ExpressionNode* Cedomp::Semantic::ComputeLess( ExpressionNode* left,
 		}
 	}
 	//Return new node here.
+	return new LessNode(checker, left, right, coercion);
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeEnclosed( ExpressionNode* val )
+ExpressionNode * Cedomp::Semantic::ComputeEnclosed( ExpressionNode * val )
 {
 	return val;
 }

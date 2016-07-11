@@ -52,6 +52,18 @@ namespace Cedomp
 			Cedomp::Type::TypeCode typeLeft;
 			Cedomp::Type::TypeCode typeRight;
 		};
+
+		class UnaryOperationNotSupported: public ExpressionException
+		{
+		public:
+			UnaryOperationNotSupported( const std::string& opName,
+					Cedomp::Type::TypeCode type );
+		protected:
+			virtual std::string Error();
+		private:
+			std::string opName;
+			Cedomp::Type::TypeCode type;
+		};
 	}
 }
 

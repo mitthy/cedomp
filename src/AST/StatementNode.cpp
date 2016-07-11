@@ -28,20 +28,45 @@ AssignVariableNode::AssignVariableNode( std::string string,
 
 void AssignVariableNode::printNode() const
 {
-	if(!index)
+	if (!index)
 	{
-		std::cout << "assigning var " << id << " = ";
+		auto& scope = Cedomp::Scope::Scope::getScope();
+		auto varSymbol = scope.searchScope(id);
+		if (varSymbol)
+		{
+			//Check for coercion
+			auto type = varSymbol->type;
+			auto typeExpr = expr->getTypeCode();
+			std::cout << "assigning var " << id << " = ";
+			if (type != typeExpr)
+			{
+				std::cout << "(" << Cedomp::Type::Type::getTypeName(type)
+						<< ") ";
+			}
+		}
+		else
+		{
+			std::cerr << "Shouldn't get here" << std::endl;
+		}
 	}
 	else
 	{
 		auto& scope = Cedomp::Scope::Scope::getScope();
 		auto varSymbol = scope.searchScope(id);
-		if(varSymbol)
+		if (varSymbol)
 		{
+			auto typeExpr = expr->getTypeCode();
 			auto typeName = Cedomp::Type::Type::getTypeName(varSymbol->type);
-			std::cout << "assigning var {type:" << typeName << "} " << id << "[";
+			std::cout << "assigning var {type:" << typeName << "} " << id
+					<< "[";
 			index->printNode();
 			std::cout << "] = ";
+			auto type = varSymbol->genericType;
+			if (type != typeExpr)
+			{
+				std::cout << "(" << Cedomp::Type::Type::getTypeName(type)
+						<< ") ";
+			}
 		}
 		else
 		{

@@ -13,7 +13,7 @@ using namespace Cedomp::AST;
 void ExpressionNode::printNode() const
 {
 	auto typeName = Cedomp::Type::Type::getTypeName(type);
-	std::cout << "{ " << typeName << ": ";
+	std::cout << "{" << typeName << ": ";
 	printExpressionValue();
 	std::cout << "}";
 }
@@ -121,5 +121,216 @@ void IndexNode::printExpressionValue() const
 	std::cout << "{" << varName << "[";
 	index->printNode();
 	std::cout << "]" << "}";
+}
+
+BinaryOperationNode::BinaryOperationNode( Cedomp::Type::TypeCode type,
+		ExpressionNode* lhs, ExpressionNode* rhs, bool coercion ) :
+		ExpressionNode(type), lhs(lhs), rhs(rhs), coercion(coercion)
+{
+
+}
+
+void BinaryOperationNode::printExpressionValue() const
+{
+	lhs->printNode();
+	std::cout << " ";
+	printOpName();
+	std::cout << " ";
+	if (coercion)
+	{
+		auto typeName = Cedomp::Type::Type::getTypeName(lhs->getTypeCode());
+		std::cout << "(" << typeName << ") ";
+	}
+	rhs->printNode();
+}
+
+ModNode::ModNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+
+void ModNode::printOpName() const
+{
+	std::cout << "mod";
+}
+
+AdditionNode::AdditionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+
+void AdditionNode::printOpName() const
+{
+	std::cout << "+";
+}
+
+SubtractionNode::SubtractionNode( Cedomp::Type::TypeCode type,
+		ExpressionNode* lhs, ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void SubtractionNode::printOpName() const
+{
+	std::cout << "-";
+}
+
+MultiplicationNode::MultiplicationNode( Cedomp::Type::TypeCode type,
+		ExpressionNode* lhs, ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void MultiplicationNode::printOpName() const
+{
+	std::cout << "*";
+}
+
+DivisionNode::DivisionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+}
+void DivisionNode::printOpName() const
+{
+	std::cout << "/";
+}
+
+EqualsNode::EqualsNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void EqualsNode::printOpName() const
+{
+	std::cout << "==";
+}
+
+DifferentNode::DifferentNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void DifferentNode::printOpName() const
+{
+	std::cout << "!=";
+}
+
+GreaterNode::GreaterNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void GreaterNode::printOpName() const
+{
+	std::cout << ">";
+}
+
+LessNode::LessNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void LessNode::printOpName() const
+{
+	std::cout << "<";
+}
+
+GreaterEqualNode::GreaterEqualNode( Cedomp::Type::TypeCode type,
+		ExpressionNode* lhs, ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void GreaterEqualNode::printOpName() const
+{
+	std::cout << ">=";
+}
+
+LessEqualNode::LessEqualNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void LessEqualNode::printOpName() const
+{
+	std::cout << "<=";
+}
+
+AndNode::AndNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void AndNode::printOpName() const
+{
+	std::cout << "and";
+}
+
+OrNode::OrNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void OrNode::printOpName() const
+{
+	std::cout << "or";
+}
+
+XorNode::XorNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
+		ExpressionNode* rhs, bool coercion ) :
+		BinaryOperationNode(type, lhs, rhs, coercion)
+{
+
+}
+void XorNode::printOpName() const
+{
+	std::cout << "xor";
+}
+
+UnaryOperationNode::UnaryOperationNode( Cedomp::Type::TypeCode type,
+		ExpressionNode* expr ) :
+		ExpressionNode(type), expr(expr)
+{
+
+}
+
+void UnaryOperationNode::printExpressionValue() const
+{
+	printOpName();
+	std::cout << " ";
+	expr->printNode();
+}
+
+UnaryMinusNode::UnaryMinusNode( Cedomp::Type::TypeCode type,
+		ExpressionNode* expr ) :
+		UnaryOperationNode(type, expr)
+{
+}
+
+void UnaryMinusNode::printOpName() const
+{
+	std::cout << "-";
+}
+
+NotNode::NotNode( Cedomp::Type::TypeCode type, ExpressionNode* expr ):
+UnaryOperationNode(type, expr)
+{
+}
+
+void NotNode::printOpName() const
+{
+	"not";
 }
 

@@ -58,3 +58,20 @@ std::string BinaryOperationNotSupported::Error()
 	result += " not supported";
 	return result;
 }
+
+UnaryOperationNotSupported::UnaryOperationNotSupported(
+		const std::string& opName, Cedomp::Type::TypeCode type ) :
+		opName(opName), type(type)
+{
+
+}
+std::string UnaryOperationNotSupported::Error()
+{
+	std::string result = "Operation ";
+	auto typeName = Cedomp::Type::Type::getTypeName(type);
+	result += opName;
+	result += " ";
+	result += typeName;
+	result += " not supported";
+	return result;
+}
