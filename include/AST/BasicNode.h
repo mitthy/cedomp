@@ -29,6 +29,12 @@ namespace Cedomp
 			std::vector<AbstractNode*> nodes;
 		};
 
+		class SemanticErrorNode: public AbstractNode
+		{
+		public:
+			virtual void printNode() const;
+		};
+
 	}
 }
 

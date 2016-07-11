@@ -86,6 +86,10 @@ ExpressionNode* Cedomp::Semantic::ComputeIndex( char * id, ExpressionNode* val )
 		}
 		else
 		{
+			if(checker != Cedomp::Type::BaseType::TYPEGENERIC)
+			{
+				varSymbol->genericType = checker;
+			}
 			if (varSymbol->genericType == Cedomp::Type::BaseType::TYPEGENERIC)
 			{
 				throw Cedomp::Exceptions::ContainerTypeNotInitialized(name);

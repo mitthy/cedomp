@@ -31,7 +31,14 @@ BlockNode* Cedomp::Semantic::AddStatement(BlockNode* block, AbstractNode* statem
 	{
 		ret = new BlockNode();
 	}
-	ret->addNode(statement);
+	if(statement)
+	{
+		ret->addNode(statement);
+	}
+	else
+	{
+		ret->addNode(new SemanticErrorNode());
+	}
 	blockRAII.release();
 	return ret;
 }

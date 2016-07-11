@@ -54,14 +54,16 @@
 %type<maptype> T_MAP
 %type<listtype> T_LIST
 
-%left T_EQUALS T_DIFFERENT T_GREATER_EQUAL T_LESS_EQUAL T_GREATER T_LESS
-%left T_AND
+
+
 %left T_OR
 %left T_XOR
+%left T_AND
+%left T_EQUALS T_DIFFERENT
+%left T_GREATER_EQUAL T_LESS_EQUAL T_GREATER T_LESS
 %left T_NOT
-%left T_MOD
 %left T_PLUS T_MINUS
-%left T_STAR T_SLASH
+%left T_STAR T_SLASH T_MOD
 %left UNARY_MINUS
 
 
@@ -78,42 +80,27 @@ statements
 statements:
 statements statement T_NL
 {
-    if($1 == nullptr)
+    try
     {
-        //TODO
-        $$ = nullptr;
+        $$ = Cedomp::Semantic::AddStatement($1, $2);
     }
-    else
+    catch(Cedomp::Exceptions::CedompException& e)
     {
-        try
-        {
-            $$ = Cedomp::Semantic::AddStatement($1, $2);
-        }
-        catch(Cedomp::Exceptions::CedompException& e)
-        {
-            $$ = nullptr;
-            e.PrintSemanticError();
-        }
+        $$ = nullptr;
+        e.PrintSemanticError();
     }
 }
 |
 statement T_NL
 {
-    if($1 == nullptr)
+    try
     {
-        //TODO
+        $$ = Cedomp::Semantic::AddStatement(nullptr, $1);
     }
-    else
+    catch(Cedomp::Exceptions::CedompException& e)
     {
-        try
-        {
-            $$ = Cedomp::Semantic::AddStatement(nullptr, $1);
-        }
-        catch(Cedomp::Exceptions::CedompException& e)
-        {
-            $$ = nullptr;
-            e.PrintSemanticError();
-        }
+        $$ = nullptr;
+        e.PrintSemanticError();
     }
 }
 |
@@ -129,6 +116,7 @@ statements T_NL
 |
 error T_NL
 {
+    $$ = nullptr;
 }
 ;
 

@@ -15,7 +15,7 @@ void BlockNode::addNode( AbstractNode* node )
 }
 void BlockNode::printNode() const
 {
-	for(auto node : nodes)
+	for (auto node : nodes)
 	{
 		node->printNode();
 		std::cout << std::endl;
@@ -23,8 +23,13 @@ void BlockNode::printNode() const
 }
 BlockNode::~BlockNode()
 {
-	for(AbstractNode* node : nodes)
+	for (AbstractNode* node : nodes)
 	{
 		delete node;
 	}
+}
+
+void SemanticErrorNode::printNode() const
+{
+	std::cout << "Semantic error ocurred in this branch";
 }
