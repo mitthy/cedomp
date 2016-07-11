@@ -80,13 +80,36 @@ namespace Cedomp
 			std::shared_ptr<std::string> value;
 		};
 
-		class MapNode : public ExpressionNode
+		class MapNode: public ExpressionNode
 		{
 		public:
-			MapNode(std::map<std::string, void*>* val);
+			MapNode( std::map<std::string, void*>* val );
+		protected:
 			virtual void printExpressionValue() const;
 		private:
 			std::shared_ptr<std::map<std::string, void*>> value;
+		};
+
+		class ListNode: public ExpressionNode
+		{
+		public:
+			ListNode( std::vector<void*>* val );
+		protected:
+			virtual void printExpressionValue() const;
+		private:
+			std::shared_ptr<std::vector<void*>> value;
+		};
+
+		class IndexNode: public ExpressionNode
+		{
+		public:
+			IndexNode( Cedomp::Type::TypeCode type, std::string varName,
+					ExpressionNode* index );
+		protected:
+			virtual void printExpressionValue() const;
+		private:
+			std::unique_ptr<ExpressionNode> index;
+			std::string varName;
 		};
 
 	}

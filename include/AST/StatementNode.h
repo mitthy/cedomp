@@ -10,6 +10,7 @@
 #include <string>
 #include "BasicNode.h"
 #include "ExpressionNode.h"
+#include <memory>
 #include <vector>
 
 namespace Cedomp
@@ -32,18 +33,17 @@ namespace Cedomp
 			virtual void printNode() const;
 		private:
 			std::string id;
-			ExpressionNode* expr;
-			ExpressionNode* index;
+			std::unique_ptr<ExpressionNode> expr;
+			std::unique_ptr<ExpressionNode> index;
 		};
 
 		class AssignBlockNode: public AbstractNode
 		{
 		public:
-			void addNode( AbstractNode* node );
+			void addNode( AssignVariableNode* node );
 			virtual void printNode() const;
-			virtual ~AssignBlockNode();
 		private:
-			std::vector<AbstractNode*> nodes;
+			std::vector<std::unique_ptr<AssignVariableNode>> nodes;
 		};
 
 	}

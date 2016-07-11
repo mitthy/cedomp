@@ -66,7 +66,7 @@ std::vector<VarNameIndex>* Cedomp::Semantic::ParseVarNames(
 	auto varSymbol = VarScope::getScope().searchScope(varName);
 	if (varSymbol)
 	{
-		auto operationCheck = Cedomp::Type::Operation::getInstance();
+		auto& operationCheck = Cedomp::Type::Operation::getInstance();
 		Cedomp::Type::TypeCode check;
 		operationCheck.getReturnBinaryType(varSymbol->type, "[]",
 				index->getTypeCode(), check);
@@ -114,6 +114,11 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 		std::vector<VarNameIndex>* ids, std::vector<ExpressionNode*>* values )
 {
 	std::unique_ptr<std::vector<VarNameIndex>> idsRAII(ids);
+	std::vector<std::unique_ptr<ExpressionNode>> exprRAII;
+	for(auto node : (*values))
+	{
+		exprRAII.push_back(std::unique_ptr<ExpressionNode>(node));
+	}
 	std::unique_ptr<std::vector<ExpressionNode*>> valuesRAII(values);
 	if (ids->size() != values->size())
 	{
@@ -164,7 +169,7 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 			VarScope::getScope().addToScope(idBeg->varName,
 					(*valBeg)->getTypeCode());
 		}
-		//Change to support indexing
+		//THIS IS NOT EXCEPTION SAFE. SHOULD BE CHANGED ASAP
 		if(idBeg->index)
 		{
 			result->push_back(new AssignVariableNode(idBeg->varName, idBeg->index, *valBeg));
@@ -173,6 +178,10 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 		{
 			result->push_back(new AssignVariableNode(idBeg->varName, *valBeg));
 		}
+	}
+	for(auto& node: exprRAII)
+	{
+		node.release();
 	}
 	return result;
 }

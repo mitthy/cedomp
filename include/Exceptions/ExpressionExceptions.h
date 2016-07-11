@@ -9,6 +9,7 @@
 #define EXPRESSIONEXCEPTION_H_
 #include "CedompException.h"
 #include <string>
+#include "Type/Types.h"
 namespace Cedomp
 {
 	namespace Exceptions
@@ -32,13 +33,25 @@ namespace Cedomp
 		class VariableNotDeclaredException: public ExpressionException
 		{
 		public:
-			VariableNotDeclaredException(const std::string& id );
+			VariableNotDeclaredException( const std::string& id );
 		protected:
 			virtual std::string Error();
 		private:
 			std::string varName;
 		};
 
+		class BinaryOperationNotSupported: public ExpressionException
+		{
+		public:
+			BinaryOperationNotSupported( const std::string& opName,
+					Cedomp::Type::TypeCode type, Cedomp::Type::TypeCode type2 );
+		protected:
+			virtual std::string Error();
+		private:
+			std::string opName;
+			Cedomp::Type::TypeCode typeLeft;
+			Cedomp::Type::TypeCode typeRight;
+		};
 	}
 }
 

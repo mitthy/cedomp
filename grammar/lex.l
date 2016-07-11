@@ -206,7 +206,7 @@ void yyerror(const char* s, ...)
 {
     va_list ap;
     va_start(ap, s);
-    fprintf(stderr, "[Line %d] Error ", yylineno);
+    fprintf(stderr, "[Line %d] Error: ", yylineno);
     vfprintf(stderr, s, ap);
     fprintf(stderr, "\n");
 }

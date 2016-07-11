@@ -18,6 +18,7 @@ AbstractNode * Cedomp::Semantic::AssignVariableStatement(std::vector<AssignVaria
 		retRAII->addNode(node);
 	}
 	AssignBlockNode* ret = retRAII.release();
+	delete nodes;
 	return ret;
 }
 

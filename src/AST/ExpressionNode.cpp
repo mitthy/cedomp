@@ -99,3 +99,27 @@ void MapNode::printExpressionValue() const
 	std::cout << "new map";
 }
 
+ListNode::ListNode( std::vector<void*>* val ) :
+		ExpressionNode(Cedomp::Type::BaseType::TYPELIST), value(val)
+{
+
+}
+
+void ListNode::printExpressionValue() const
+{
+	std::cout << "new list";
+}
+
+IndexNode::IndexNode( Cedomp::Type::TypeCode type, std::string varName,
+		ExpressionNode* index ) :
+		ExpressionNode(type), varName(varName), index(index)
+{
+
+}
+void IndexNode::printExpressionValue() const
+{
+	std::cout << "{" << varName << "[";
+	index->printNode();
+	std::cout << "]" << "}";
+}
+

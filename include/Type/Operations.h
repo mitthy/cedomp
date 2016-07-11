@@ -19,31 +19,35 @@ namespace Cedomp
 		{
 		public:
 
-			static Operation getInstance();
+			static Operation& getInstance();
+
+			Operation( const Operation& rhs ) = delete;
+
+			Operation& operator=( const Operation& rhs ) = delete;
 
 			void registerBinaryOperation( TypeCode type1,
 					const std::string& operation, TypeCode type2,
 					TypeCode returnType );
 
-			void registerUnaryOperation( TypeCode type, const std::string& operation,
-					TypeCode ret );
+			void registerUnaryOperation( TypeCode type,
+					const std::string& operation, TypeCode ret );
 
 			bool getReturnBinaryType( TypeCode type1,
 					const std::string& operation, TypeCode type2,
 					TypeCode& ret );
 
-			bool getReturnUnaryType( TypeCode type, const std::string& operation,
-					TypeCode& ret );
-
+			bool getReturnUnaryType( TypeCode type,
+					const std::string& operation, TypeCode& ret );
 
 		private:
-			std::map<TypeCode, std::map<std::string, std::map<TypeCode, TypeCode>>> binaryOpMap;
-			std::map<TypeCode, std::map<std::string, TypeCode>> unaryOpMap;
-			void initializeBinaryOpMap();
-			void initializeUnaryOpMap();
-			Operation();
-		};
-	}
+			std::map<TypeCode,
+					std::map<std::string, std::map<TypeCode, TypeCode>>>binaryOpMap;
+		std::map<TypeCode, std::map<std::string, TypeCode>> unaryOpMap;
+		void initializeBinaryOpMap();
+		void initializeUnaryOpMap();
+		Operation();
+	};
+}
 
 }
 

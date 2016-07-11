@@ -9,7 +9,7 @@
 #include "Scope/Scope.h"
 #include "Type/Types.h"
 #include <iostream>
-
+#include <memory>
 using namespace Cedomp::AST;
 
 AssignVariableNode::AssignVariableNode( std::string string,
@@ -51,9 +51,9 @@ void AssignVariableNode::printNode() const
 	this->expr->printNode();
 }
 
-void AssignBlockNode::addNode( AbstractNode* node )
+void AssignBlockNode::addNode( AssignVariableNode* node )
 {
-	nodes.push_back(node);
+	nodes.push_back(std::unique_ptr<AssignVariableNode>(node));
 }
 
 void AssignBlockNode::printNode() const
@@ -71,10 +71,3 @@ void AssignBlockNode::printNode() const
 	}
 }
 
-AssignBlockNode::~AssignBlockNode()
-{
-	for (auto node : nodes)
-	{
-		delete node;
-	}
-}

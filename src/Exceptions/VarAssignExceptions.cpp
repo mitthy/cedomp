@@ -16,7 +16,7 @@ FunctionAsVariable::FunctionAsVariable( const std::string& funcName ) :
 
 std::string FunctionAsVariable::Error()
 {
-	std::string result = "using function ";
+	std::string result = "Using function ";
 	result += varName;
 	result += " as variable";
 	return result;
@@ -32,7 +32,7 @@ std::string WrongVarNumberException::Error()
 {
 	std::string varAmountStr = std::to_string(varAmount);
 	std::string exprAmountStr = std::to_string(exprAmount);
-	std::string result = "assigning ";
+	std::string result = "Assigning ";
 	result += exprAmountStr;
 	result += " expressions to ";
 	result += varAmountStr;
@@ -48,7 +48,7 @@ IndexNotSupportedException::IndexNotSupportedException(
 
 std::string IndexNotSupportedException::Error()
 {
-	std::string result = "variable ";
+	std::string result = "Variable ";
 	result += varName;
 	result += " can't be indexed";
 	return result;

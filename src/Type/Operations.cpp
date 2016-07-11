@@ -9,7 +9,7 @@
 
 using namespace Cedomp::Type;
 
-Operation Operation::getInstance()
+Operation& Operation::getInstance()
 {
 	static Operation op;
 	return op;

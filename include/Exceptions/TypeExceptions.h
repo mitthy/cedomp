@@ -33,6 +33,30 @@ namespace Cedomp
 			Type::TypeCode typeCode1;
 			Type::TypeCode typeCode2;
 		};
+
+		class IndexNotSupportedTypeException: public TypeException
+		{
+		public:
+			IndexNotSupportedTypeException( std::string varName,
+					Cedomp::Type::TypeCode typeId,
+					Cedomp::Type::TypeCode typeIndex );
+		protected:
+			virtual std::string Error();
+		private:
+			std::string varName;
+			Cedomp::Type::TypeCode typeId;
+			Cedomp::Type::TypeCode typeIndex;
+		};
+
+		class ContainerTypeNotInitialized: public TypeException
+		{
+		public:
+			ContainerTypeNotInitialized( const std::string& id );
+		protected:
+			virtual std::string Error();
+		private:
+			std::string id;
+		};
 	}
 }
 
