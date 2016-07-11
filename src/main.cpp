@@ -1,5 +1,8 @@
 extern int yyparse();
-int main(int argc, char** argv)
+#include "AST/AST.h"
+extern Cedomp::AST::AbstractNode* root;
+int main( int argc, char** argv )
 {
-    yyparse();
+	yyparse();
+	root->printNode();
 }

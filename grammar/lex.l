@@ -6,6 +6,8 @@
     #include <iostream>
     #include <vector>
     #include "Semantic/VarAssign.h"
+    #include "Semantic/Statement.h"
+    #include "Semantic/Expression.h"
     #include "Exceptions/CedompException.h"
     #include "AST/AST.h"
     #define YY_DECL int yylex()
@@ -271,6 +273,10 @@ bool processString(std::string** src)
                     }
                 }
             }
+        }
+        else if(curr == '\n' || curr == '\t')
+        {
+            continue;
         }
         else
         {

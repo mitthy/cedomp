@@ -22,12 +22,16 @@ std::set<std::string> createTypeSet()
 	ret.insert("function");
 	ret.insert("map");
 	ret.insert("list");
+	ret.insert("string");
+	ret.insert("generic");
 	return ret;
 }
 
 /**
  * This should be altered everytime a new base time is introduced to the language
  */
+
+
 std::map<TypeCode, std::string> createTypeMap()
 {
 	std::map<TypeCode, std::string> ret;
@@ -37,6 +41,8 @@ std::map<TypeCode, std::string> createTypeMap()
 	ret[TYPEFUNCTION] = "function";
 	ret[TYPEMAP] = "map";
 	ret[TYPELIST] = "list";
+	ret[TYPESTRING] = "string";
+	ret[TYPEGENERIC] = "generic";
 	return ret;
 }
 

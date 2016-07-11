@@ -21,8 +21,7 @@ namespace Cedomp
 		struct variableInfo
 		{
 			Type::TypeCode type;
-			bool isArray;
-			unsigned int arrSize;
+			Type::TypeCode genericType;
 			bool globalScope;
 			variableInfo();
 		};

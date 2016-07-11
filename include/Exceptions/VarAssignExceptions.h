@@ -53,16 +53,6 @@ namespace Cedomp
 			std::string varName;
 		};
 
-		class VariableNotDeclaredException: public VarAssignException
-		{
-		public:
-			VariableNotDeclaredException( const std::string& varName );
-		protected:
-			virtual std::string Error();
-		private:
-			std::string varName;
-		};
-
 	}
 }
 

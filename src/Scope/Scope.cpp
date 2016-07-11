@@ -29,9 +29,8 @@ FunctionScope& FunctionScope::getScope()
 variableInfo::variableInfo()
 {
 	this->type = 0;
-	this->isArray = false;
-	this->arrSize = 0;
 	this->globalScope = false;
+	this->genericType = BaseType::TYPEGENERIC;
 
 }
 

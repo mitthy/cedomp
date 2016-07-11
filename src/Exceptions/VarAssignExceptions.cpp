@@ -54,16 +54,3 @@ std::string IndexNotSupportedException::Error()
 	return result;
 }
 
-VariableNotDeclaredException::VariableNotDeclaredException(
-		const std::string& varName ) :
-		varName(varName)
-{
-}
-
-std::string VariableNotDeclaredException::Error()
-{
-	std::string result = "variable ";
-	result += varName;
-	result += " was not declared so can't be indexed";
-	return result;
-}

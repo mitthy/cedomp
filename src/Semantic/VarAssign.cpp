@@ -12,8 +12,10 @@
 #include "AST/AST.h"
 #include "Exceptions/VarAssignExceptions.h"
 #include "Exceptions/TypeExceptions.h"
+#include "Exceptions/ExpressionExceptions.h"
 #include "Type/Types.h"
 #include <iostream>
+#include "Type/Operations.h"
 #include <memory>
 
 /*
@@ -64,21 +66,19 @@ std::vector<VarNameIndex>* Cedomp::Semantic::ParseVarNames(
 	auto varSymbol = VarScope::getScope().searchScope(varName);
 	if (varSymbol)
 	{
-		//If it is a base type of the language:
-		if (Cedomp::Type::Type::isBaseType(varSymbol->type))
+		auto operationCheck = Cedomp::Type::Operation::getInstance();
+		Cedomp::Type::TypeCode check;
+		operationCheck.getReturnBinaryType(varSymbol->type, "[]",
+				index->getTypeCode(), check);
+		if (check == Cedomp::Type::BaseType::TYPEERROR)
 		{
-			//Check if it supports indexing
-			if (varSymbol->type != Cedomp::Type::BaseType::TYPEMAP
-					&& varSymbol->type != Cedomp::Type::BaseType::TYPELIST)
-			{
-				throw IndexNotSupportedException(varName);
-			}
+			throw IndexNotSupportedException(varName);
 		}
 	}
 	else
 	{
 		//Can't index a variable that was not declared.
-		throw VariableNotDeclaredException(varName);
+		throw VariableNotDeclaredIndexedException(varName);
 	}
 	std::vector<VarNameIndex>* result = previous;
 	if (!result)
@@ -134,8 +134,29 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 			if (!Cedomp::Type::Type::isCompatible(varSymbol->type,
 					(*valBeg)->getTypeCode()))
 			{
-				throw IncompatibleTypeException(varSymbol->type,
-						(*valBeg)->getTypeCode());
+				//Check index
+				if (!idBeg->index)
+				{
+					throw IncompatibleTypeException(varSymbol->type,
+							(*valBeg)->getTypeCode());
+				}
+				else
+				{
+					if (varSymbol->genericType == Type::TYPEGENERIC)
+					{
+						varSymbol->genericType = (*valBeg)->getTypeCode();
+					}
+					else
+					{
+						if (!Cedomp::Type::Type::isCompatible(
+								varSymbol->genericType,
+								(*valBeg)->getTypeCode()))
+						{
+							throw IncompatibleTypeException(varSymbol->genericType,
+									(*valBeg)->getTypeCode());
+						}
+					}
+				}
 			}
 		}
 		else
@@ -144,7 +165,14 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 					(*valBeg)->getTypeCode());
 		}
 		//Change to support indexing
-		result->push_back(new AssignVariableNode(idBeg->varName, *valBeg));
+		if(idBeg->index)
+		{
+			result->push_back(new AssignVariableNode(idBeg->varName, idBeg->index, *valBeg));
+		}
+		else
+		{
+			result->push_back(new AssignVariableNode(idBeg->varName, *valBeg));
+		}
 	}
 	return result;
 }
