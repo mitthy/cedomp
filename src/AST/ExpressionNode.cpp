@@ -18,7 +18,12 @@ void ExpressionNode::printNode() const
 		std::cout << "(" << coercionTypeName << ") ";
 	}
 	auto typeName = Cedomp::Type::Type::getTypeName(type);
-	std::cout << "{" << typeName << ": ";
+	std::cout << "{" << typeName << ":";
+	if(getGenericTypeCode() != Cedomp::Type::TYPEGENERIC && getGenericTypeCode() != Cedomp::Type::TYPEERROR)
+	{
+		std::cout << Cedomp::Type::Type::getTypeName(genericTypeCode);
+	}
+	std::cout << " ";
 	printExpressionValue();
 	std::cout << "}";
 }

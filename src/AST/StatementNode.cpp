@@ -39,10 +39,17 @@ void AssignVariableNode::printNode() const
 		{
 			//Check for coercion
 			auto type = varSymbol->type;
-			auto typeExpr = expr->getTypeCode();
+			auto varTypeGeneric = varSymbol->genericType;
 			std::cout << "assigning var " << "{type:"
-					<< Cedomp::Type::Type::getTypeName(type) << "} " << id
-					<< " = ";
+					<< Cedomp::Type::Type::getTypeName(type);
+			if (varTypeGeneric != Cedomp::Type::TYPEGENERIC
+					&& varTypeGeneric != Cedomp::Type::TYPEERROR
+					&& varTypeGeneric != varSymbol->type)
+			{
+				std::cout << ":"
+						<< Cedomp::Type::Type::getTypeName(varTypeGeneric);
+			}
+			std::cout << "} " << id << " = ";
 		}
 		else
 		{
@@ -55,7 +62,6 @@ void AssignVariableNode::printNode() const
 		auto varSymbol = scope->searchScope(id);
 		if (varSymbol)
 		{
-			auto typeExpr = expr->getTypeCode();
 			auto typeName = Cedomp::Type::Type::getTypeName(varSymbol->type);
 			std::cout << "assigning var {type:" << typeName << "} " << id
 					<< "[";
@@ -126,7 +132,8 @@ void IfNode::printNode() const
 
 }
 
-WhileNode::WhileNode( ExpressionNode* condition, BlockNode* body ): condition(condition), body(body)
+WhileNode::WhileNode( ExpressionNode* condition, BlockNode* body ) :
+		condition(condition), body(body)
 {
 
 }
