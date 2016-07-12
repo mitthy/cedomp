@@ -217,9 +217,9 @@ void Operation::initializeBinaryOpMap()
 			BaseType::TYPELIST);
 	registerBinaryOperation(BaseType::TYPELIST, "-=", BaseType::TYPEINT,
 			BaseType::TYPELIST);
-	registerBinaryOperation(BaseType::TYPELIST, "+=", BaseType::TYPEINT,
+	registerBinaryOperation(BaseType::TYPELIST, "+=", BaseType::TYPEGENERIC,
 			BaseType::TYPELIST);
-	registerBinaryOperation(BaseType::TYPELIST, "+", BaseType::TYPEINT,
+	registerBinaryOperation(BaseType::TYPELIST, "+", BaseType::TYPEGENERIC,
 			BaseType::TYPELIST);
 
 }

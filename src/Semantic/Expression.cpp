@@ -39,11 +39,16 @@ ExpressionNode* Cedomp::Semantic::ComputeID( char * val )
 	auto& funScope = Cedomp::Scope::FunctionScope::getScope();
 	if (funScope.searchScope(id))
 	{
-		return new VariableNode(id, Type::BaseType::TYPEFUNCTION);
+		VariableNode* ret = new VariableNode(id, Type::BaseType::TYPEFUNCTION);
+		ret->setGenericTypeCode(funScope.searchScope(id)->type);
+		return ret;
 	}
 	else if (varScope.searchScope(id))
 	{
-		return new VariableNode(id, varScope.searchScope(id)->type);
+		VariableNode* ret = new VariableNode(id,
+				varScope.searchScope(id)->type);
+		ret->setGenericTypeCode(varScope.searchScope(id)->genericType);
+		return ret;
 	}
 	else
 	{
@@ -86,7 +91,7 @@ ExpressionNode* Cedomp::Semantic::ComputeIndex( char * id, ExpressionNode* val )
 		}
 		else
 		{
-			if(checker != Cedomp::Type::BaseType::TYPEGENERIC)
+			if (checker != Cedomp::Type::BaseType::TYPEGENERIC)
 			{
 				varSymbol->genericType = checker;
 			}
@@ -106,15 +111,15 @@ ExpressionNode* Cedomp::Semantic::ComputeIndex( char * id, ExpressionNode* val )
 	}
 }
 
-ExpressionNode* Cedomp::Semantic::ComputeMod( ExpressionNode* left,
-		ExpressionNode* right )
+void computeBinary( std::string opName, ExpressionNode* left,
+		ExpressionNode* right, Cedomp::Type::TypeCode& exprType, bool& coercion,
+		Cedomp::Type::TypeCode& genericType )
 {
-	std::string opName("mod");
 	auto& operation = Cedomp::Type::Operation::getInstance();
 	Cedomp::Type::TypeCode checker;
 	operation.getReturnBinaryType(left->getTypeCode(), opName,
 			right->getTypeCode(), checker);
-	bool coercion = false;
+	Cedomp::Type::TypeCode genericTypeCode = Cedomp::Type::BaseType::TYPEGENERIC;
 	if (checker == Cedomp::Type::BaseType::TYPEERROR)
 	{
 		//Try coercion
@@ -125,52 +130,101 @@ ExpressionNode* Cedomp::Semantic::ComputeMod( ExpressionNode* left,
 					left->getTypeCode(), checker);
 			if (checker == Cedomp::Type::BaseType::TYPEERROR)
 			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
+				//Try generic type
+				if (!operation.getReturnBinaryType(left->getTypeCode(), opName,
+						Cedomp::Type::BaseType::TYPEGENERIC, checker))
+				{
+					throw BinaryOperationNotSupported(opName,
+							left->getTypeCode(), right->getTypeCode());
+				}
+				else
+				{
+					if (left->getGenericTypeCode()
+							== Cedomp::Type::BaseType::TYPEGENERIC)
+					{
+						genericTypeCode = right->getTypeCode();
+					}
+					else if (Cedomp::Type::Type::isCompatible(
+							left->getGenericTypeCode(), right->getTypeCode()))
+					{
+						genericTypeCode = left->getGenericTypeCode();
+						coercion = true;
+					}
+					else
+					{
+						throw IncompatibleTypeException(
+								left->getGenericTypeCode(),
+								right->getTypeCode());
+					}
+
+				}
 			}
-			coercion = true;
+			else
+			{
+				//Coercion successful
+				coercion = true;
+			}
 		}
 		else
 		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
+			//Try generic type
+			if (!operation.getReturnBinaryType(left->getTypeCode(), opName,
+					Cedomp::Type::BaseType::TYPEGENERIC, checker))
+			{
+				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
+						right->getTypeCode());
+			}
+			else
+			{
+				if (left->getGenericTypeCode()
+						== Cedomp::Type::BaseType::TYPEGENERIC)
+				{
+					genericTypeCode = right->getTypeCode();
+				}
+				else if (Cedomp::Type::Type::isCompatible(
+						left->getGenericTypeCode(), right->getTypeCode()))
+				{
+					genericTypeCode = left->getGenericTypeCode();
+					coercion = true;
+				}
+				else
+				{
+					throw IncompatibleTypeException(left->getGenericTypeCode(),
+							right->getTypeCode());
+				}
+			}
 		}
 	}
+	exprType = checker;
+	genericType = genericTypeCode;
+}
+
+ExpressionNode* Cedomp::Semantic::ComputeMod( ExpressionNode* left,
+		ExpressionNode* right )
+{
+	std::string opName("mod");
+	bool coercion = false;
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new ModNode(checker, left, right, coercion);
+	ModNode* ret = new ModNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode* Cedomp::Semantic::ComputeAddition( ExpressionNode* left,
 		ExpressionNode* right )
 {
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), "+",
-			right->getTypeCode(), checker);
+	std::string opName("+");
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), "+",
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported("+", left->getTypeCode(),
-						right->getTypeCode());
-			}
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported("+", left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new AdditionNode(checker, left, right, coercion);
+	AdditionNode* ret = new AdditionNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 
 }
 
@@ -178,105 +232,42 @@ ExpressionNode* Cedomp::Semantic::ComputeSubtraction( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("-");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new SubtractionNode(checker, left, right, coercion);
+	SubtractionNode* ret = new SubtractionNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode* Cedomp::Semantic::ComputeMultiplication( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("*");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new MultiplicationNode(checker, left, right, coercion);
+	MultiplicationNode* ret = new MultiplicationNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode* Cedomp::Semantic::ComputeDivision( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("/");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new DivisionNode(checker, left, right, coercion);
+	DivisionNode* ret = new DivisionNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode* Cedomp::Semantic::ComputeUnaryMinus( ExpressionNode* val )
@@ -297,245 +288,97 @@ ExpressionNode * Cedomp::Semantic::ComputeGreaterThan( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName(">");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new GreaterNode(checker, left, right, coercion);
+	GreaterNode* ret = new GreaterNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeEquals( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("==");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
-	//Return new node here.
-	return new EqualsNode(checker, left, right, coercion);
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
+	EqualsNode* ret = new EqualsNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeDifferent( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("!=");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new DifferentNode(checker, left, right, coercion);
+	DifferentNode* ret = new DifferentNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeGreaterEquals( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName(">=");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new GreaterEqualNode(checker, left, right, coercion);
+	GreaterEqualNode* ret = new GreaterEqualNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeAnd( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("and");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new AndNode(checker, left, right, coercion);
+	AndNode* ret = new AndNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeXor( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("xor");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
-	return new XorNode(checker, left, right, coercion);
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
+	XorNode* ret = new XorNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeOr( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("or");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
 	//Return new node here.
-	return new OrNode(checker, left, right, coercion);
+	OrNode* ret = new OrNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeNot( ExpressionNode * val )
@@ -556,70 +399,26 @@ ExpressionNode * Cedomp::Semantic::ComputeLessEqual( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("<=");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
-	//Return new node here.
-	return new LessEqualNode(checker, left, right, coercion);
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
+	LessEqualNode* ret = new LessEqualNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeLess( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("<");
-	auto& operation = Cedomp::Type::Operation::getInstance();
-	Cedomp::Type::TypeCode checker;
-	operation.getReturnBinaryType(left->getTypeCode(), opName,
-			right->getTypeCode(), checker);
 	bool coercion = false;
-	if (checker == Cedomp::Type::BaseType::TYPEERROR)
-	{
-		//Try coercion
-		if (Cedomp::Type::Type::isCompatible(left->getTypeCode(),
-				right->getTypeCode()))
-		{
-			operation.getReturnBinaryType(left->getTypeCode(), opName,
-					left->getTypeCode(), checker);
-			if (checker == Cedomp::Type::BaseType::TYPEERROR)
-			{
-				throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-						right->getTypeCode());
-			}
-			//Coercion successful
-			coercion = true;
-		}
-		else
-		{
-			throw BinaryOperationNotSupported(opName, left->getTypeCode(),
-					right->getTypeCode());
-		}
-	}
-	//Return new node here.
-	return new LessNode(checker, left, right, coercion);
+	Cedomp::Type::TypeCode exprType;
+	Cedomp::Type::TypeCode genericType;
+	computeBinary(opName, left, right, exprType, coercion, genericType);
+	LessNode* ret = new LessNode(exprType, left, right, coercion);
+	ret->setGenericTypeCode(genericType);
+	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeEnclosed( ExpressionNode * val )

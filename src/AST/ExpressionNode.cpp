@@ -19,13 +19,23 @@ void ExpressionNode::printNode() const
 }
 
 ExpressionNode::ExpressionNode( Type::TypeCode type ) :
-		type(type)
+		type(type), genericTypeCode(Cedomp::Type::BaseType::TYPEGENERIC)
 {
 }
 
-Cedomp::Type::TypeCode ExpressionNode::getTypeCode()
+Cedomp::Type::TypeCode ExpressionNode::getTypeCode() const
 {
 	return this->type;
+}
+
+Cedomp::Type::TypeCode ExpressionNode::getGenericTypeCode() const
+{
+	return genericTypeCode;
+}
+
+void ExpressionNode::setGenericTypeCode( Cedomp::Type::TypeCode generic )
+{
+	genericTypeCode = generic;
 }
 
 VariableNode::VariableNode( std::string name, Type::TypeCode type ) :
@@ -324,8 +334,8 @@ void UnaryMinusNode::printOpName() const
 	std::cout << "-";
 }
 
-NotNode::NotNode( Cedomp::Type::TypeCode type, ExpressionNode* expr ):
-UnaryOperationNode(type, expr)
+NotNode::NotNode( Cedomp::Type::TypeCode type, ExpressionNode* expr ) :
+		UnaryOperationNode(type, expr)
 {
 }
 

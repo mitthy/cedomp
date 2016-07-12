@@ -23,10 +23,13 @@ namespace Cedomp
 		public:
 			ExpressionNode( Type::TypeCode type );
 			virtual ~ExpressionNode() = default;
-			Type::TypeCode getTypeCode();
+			Type::TypeCode getTypeCode() const;
+			Type::TypeCode getGenericTypeCode() const;
+			void setGenericTypeCode(Type::TypeCode generic);
 			virtual void printNode() const;
 		protected:
 			Type::TypeCode type;
+			Type::TypeCode genericTypeCode;
 			virtual void printExpressionValue() const = 0;
 		};
 
