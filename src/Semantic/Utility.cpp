@@ -11,6 +11,7 @@
 void Cedomp::Semantic::CreateScope()
 {
 	Cedomp::Scope::Scope::getScope().generateScope();
+	Cedomp::Scope::FunctionScope::getScope().generateScope();
 	//Change to include function scope later
 }
 
@@ -18,6 +19,7 @@ void Cedomp::Semantic::CreateScope()
 void Cedomp::Semantic::DestroyScope()
 {
 	Cedomp::Scope::Scope::getScope().deleteScope();
+	Cedomp::Scope::FunctionScope::getScope().deleteScope();
 	//Change to include function scope later
 }
 

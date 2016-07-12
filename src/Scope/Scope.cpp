@@ -14,18 +14,6 @@ using namespace std;
 using namespace Cedomp::Scope;
 using namespace Cedomp::Type;
 
-Scope& Scope::getScope()
-{
-	static Scope scope;
-	return scope;
-}
-
-FunctionScope& FunctionScope::getScope()
-{
-	static FunctionScope scope;
-	return scope;
-}
-
 variableInfo::variableInfo()
 {
 	this->type = 0;
@@ -33,6 +21,14 @@ variableInfo::variableInfo()
 	this->genericType = BaseType::TYPEGENERIC;
 
 }
+
+/*
+ *
+ *
+ * VAR SCOPE NODE
+ *
+ *
+ */
 
 ScopeNode::ScopeNode( ScopeNode* previous ) :
 		previous(previous)
@@ -70,14 +66,16 @@ ScopeNode* ScopeNode::previousNode()
 	return this->previous;
 }
 
-Scope::Scope() :
-		globalScope(new ScopeNode(nullptr)), tail(globalScope)
+bool ScopeNode::searchCurrentScope( const std::string& varName,
+		variableInfo** outputInfo )
 {
-}
-
-ScopeNode* Scope::getCurrentScope()
-{
-	return tail;
+	auto position = variableValMap.find(varName);
+	if (position == variableValMap.end())
+	{
+		return false;
+	}
+	*outputInfo = &position->second;
+	return true;
 }
 
 void ScopeNode::generateScope( ScopeNode** currentScope )
@@ -103,17 +101,47 @@ variableInfo* ScopeNode::searchScope( const std::string& varName )
 
 ScopeNode::~ScopeNode()
 {
-	for(auto child : children)
+	for (auto& child : children)
 	{
 		delete child;
 	}
+}
+
+/*
+ *
+ *
+ * VAR SCOPE
+ *
+ *
+ */
+
+Scope& Scope::getScope()
+{
+	static Scope scope;
+	return scope;
+}
+
+void Scope::addToScope( const std::string& name, const TypeCode& varType )
+{
+	tail->addToScope(name, varType);
+}
+
+ScopeNode* Scope::getCurrentScope()
+{
+	return tail;
+}
+
+variableInfo* Scope::searchCurrentScope( const string& varName )
+{
+	variableInfo* ret = nullptr;
+	tail->searchCurrentScope(varName, &ret);
+	return ret;
 }
 
 Scope::~Scope()
 {
 	delete globalScope;
 }
-
 
 void Scope::generateScope()
 {
@@ -127,81 +155,150 @@ variableInfo* Scope::searchScope( const std::string& varName )
 	return varInfo;
 }
 
+Scope::Scope() :
+		globalScope(new ScopeNode(nullptr)), tail(globalScope)
+{
+}
+
 bool Scope::deleteScope()
 {
 	tail->destroyScope(&tail);
-}
-
-FunctionScope::FunctionScope() :
-		functionValMap(std::map<std::string, functionInfo>())
-{
-}
-
-void FunctionScope::addToScope( const std::string& name,
-		const TypeCode& varType, std::vector<AST::VariableNode*> args )
-{
-	functionInfo entry;
-	entry.defined = false;
-	entry.type = varType;
-	entry.argInfo = std::vector<variableInfo>();
-	for (auto& var : args)
-	{
-		variableInfo varInfo;
-		//TODO
-		//varInfo.isArray = var->isArray();
-		//varInfo.type = var->getType();
-		//varInfo.arrSize = var->arrSize();
-		varInfo.globalScope = false;
-		entry.argInfo.push_back(varInfo);
-	}
-	functionValMap[name] = entry;
-}
-
-bool ScopeNode::searchCurrentScope( const std::string& varName,
-		variableInfo** outputInfo )
-{
-	auto position = variableValMap.find(varName);
-	if (position == variableValMap.end())
-	{
-		return false;
-	}
-	*outputInfo = &position->second;
 	return true;
 }
 
-variableInfo* Scope::searchCurrentScope( const string& varName )
+/*
+ *
+ *
+ *
+ * FUNCTION SCOPE
+ *
+ *
+ */
+
+FunctionScope& FunctionScope::getScope()
 {
-	variableInfo* ret = nullptr;
-	tail->searchCurrentScope(varName, &ret);
-	return ret;
+	static FunctionScope scope;
+	return scope;
 }
 
-functionInfo* FunctionScope::searchScope( const std::string& funcName )
-{
-	auto position = functionValMap.find(funcName);
-	if (position == functionValMap.end())
-	{
-		return nullptr;
-	}
-	return &position->second;
-}
-
-void Scope::addToScope( const std::string& name, const TypeCode& varType )
+void FunctionScope::addToScope( const std::string& name,
+		const Type::TypeCode& varType )
 {
 	tail->addToScope(name, varType);
 }
-
-std::map<std::string, functionInfo>::iterator FunctionScope::begin()
-{
-	return this->functionValMap.begin();
-}
-
-std::map<std::string, functionInfo>::iterator FunctionScope::end()
-{
-	return this->functionValMap.end();
-}
-
 FunctionScope::~FunctionScope()
 {
+	delete globalScope;
+}
+void FunctionScope::generateScope()
+{
+	tail->generateScope(&tail);
+}
+functionInfo* FunctionScope::searchScope( const std::string& varName )
+{
+	return tail->searchScope(varName);
+}
+functionInfo* FunctionScope::searchCurrentScope( const std::string& varName )
+{
+	functionInfo* ret = nullptr;
+	tail->searchCurrentScope(varName, &ret);
+	return ret;
+}
+bool FunctionScope::deleteScope()
+{
+	if (tail == globalScope)
+	{
+		return false;
+	}
+	tail->destroyScope(&tail);
+	return true;
+}
 
+FunctionScopeNode* FunctionScope::getCurrentScope()
+{
+	return tail;
+}
+
+FunctionScope::FunctionScope() :
+		globalScope(new FunctionScopeNode(nullptr)), tail(globalScope)
+{
+
+}
+
+/*
+ *
+ * FUNCTION SCOPE NODE
+ *
+ */
+
+FunctionScopeNode::FunctionScopeNode( FunctionScopeNode* previous ): previous(previous)
+{
+}
+
+bool FunctionScopeNode::searchScope( const std::string& name,
+		functionInfo** outputInfo )
+{
+	if (functionValMap.find(name) == functionValMap.end())
+	{
+		if (previous == nullptr)
+		{
+			return false;
+		}
+		return previous->searchScope(name, outputInfo);
+	}
+	*outputInfo = &functionValMap[name];
+	return true;
+}
+
+bool FunctionScopeNode::searchCurrentScope( const std::string& varName,
+		functionInfo** outputInfo )
+{
+	if (functionValMap.find(varName) == functionValMap.end())
+	{
+		return false;
+	}
+	*outputInfo = &functionValMap[varName];
+	return true;
+}
+
+void FunctionScopeNode::addToScope( const std::string& name,
+		const Cedomp::Type::TypeCode& varType )
+{
+	functionInfo info;
+	info.type = varType;
+	functionValMap[name] = info;
+}
+FunctionScopeNode* FunctionScopeNode::previousNode()
+{
+	return this->previous;
+}
+
+void FunctionScopeNode::generateScope( FunctionScopeNode** curentScope )
+{
+	FunctionScopeNode* next = new FunctionScopeNode(this);
+	this->children.push_back(next);
+	*curentScope = next;
+}
+
+void FunctionScopeNode::destroyScope( FunctionScopeNode** currentScope )
+{
+	if (previous != nullptr)
+	{
+		*currentScope = previous;
+	}
+}
+
+functionInfo* FunctionScopeNode::searchScope( const std::string& varName )
+{
+	functionInfo* ret = nullptr;
+	searchScope(varName, &ret);
+	return ret;
+}
+
+FunctionScopeNode::~FunctionScopeNode()
+{
+	for (auto& child : children)
+	{
+		delete child;
+	}
 }

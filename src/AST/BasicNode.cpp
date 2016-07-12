@@ -31,5 +31,5 @@ BlockNode::~BlockNode()
 
 void SemanticErrorNode::printNode() const
 {
-	std::cout << "Semantic error ocurred in this branch";
+	std::cout << "semantic error ocurred in this branch";
 }

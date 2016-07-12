@@ -222,9 +222,9 @@ void Operation::initializeBinaryOpMap()
 	registerBinaryOperation(BaseType::TYPELIST, "+", BaseType::TYPEGENERIC,
 			BaseType::TYPELIST);
 	registerBinaryOperation(BaseType::TYPELIST, "+", BaseType::TYPELIST,
-				BaseType::TYPELIST);
+			BaseType::TYPELIST);
 	registerBinaryOperation(BaseType::TYPELIST, "+=", BaseType::TYPELIST,
-					BaseType::TYPELIST);
+			BaseType::TYPELIST);
 
 }
 
@@ -232,6 +232,8 @@ void Operation::initializeUnaryOpMap()
 {
 	registerUnaryOperation(BaseType::TYPEBOOL, "not", BaseType::TYPEBOOL);
 	registerUnaryOperation(BaseType::TYPEFUNCTION, "()", BaseType::TYPEGENERIC);
+	registerUnaryOperation(BaseType::TYPESTRING, "len", BaseType::TYPEINT);
+	registerUnaryOperation(BaseType::TYPELIST, "len", BaseType::TYPEINT);
 	registerUnaryOperation(BaseType::TYPEINT, "-", BaseType::TYPEINT);
 	registerUnaryOperation(BaseType::TYPEFLOAT, "-", BaseType::TYPEFLOAT);
 }

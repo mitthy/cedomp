@@ -78,23 +78,47 @@ namespace Cedomp
 			ScopeNode* tail;
 		};
 
+		class FunctionScopeNode
+		{
+		public:
+			FunctionScopeNode( FunctionScopeNode* previous );
+			bool searchScope( const std::string& name,
+					functionInfo** outputInfo );
+			bool searchCurrentScope( const std::string& varName,
+					functionInfo** outputInfo );
+			void addToScope( const std::string& name,
+					const Type::TypeCode& varType );
+			FunctionScopeNode* previousNode();
+			FunctionScopeNode( const FunctionScopeNode& rhs ) = delete;
+			FunctionScopeNode& operator=( const FunctionScopeNode& rhs ) = delete;
+			void generateScope( FunctionScopeNode** curentScope );
+			void destroyScope( FunctionScopeNode** currentScope );
+			functionInfo* searchScope( const std::string& varName );
+			~FunctionScopeNode();
+		private:
+			FunctionScopeNode* previous;
+			std::vector<FunctionScopeNode*> children;
+			std::map<std::string, functionInfo> functionValMap;
+		};
+
 		class FunctionScope
 		{
 		public:
 			static FunctionScope& getScope();
 			FunctionScope( const FunctionScope& rhs ) = delete;
-			FunctionScope& operator=( const FunctionScope& rhs ) = delete;
+			Scope& operator=( const FunctionScope& rhs ) = delete;
 			void addToScope( const std::string& name,
-					const Type::TypeCode& varType,
-					std::vector<AST::VariableNode*> args );
+					const Type::TypeCode& varType );
 			~FunctionScope();
-			functionInfo* searchScope( const std::string& funcName );
-			std::map<std::string, functionInfo>::iterator begin();
-			std::map<std::string, functionInfo>::iterator end();
+			void generateScope();
+			functionInfo* searchScope( const std::string& varName );
+			functionInfo* searchCurrentScope( const std::string& varName );
+			bool deleteScope();
+			FunctionScopeNode* getCurrentScope();
 		private:
 			FunctionScope();
-			std::map<std::string, functionInfo> functionValMap;
-
+			FunctionScopeNode* globalScope;
+			FunctionScopeNode* tail;
 		};
 
 	}

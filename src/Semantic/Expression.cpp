@@ -116,7 +116,6 @@ ExpressionNode* Cedomp::Semantic::ComputeIndex( char * id, ExpressionNode* val )
 	}
 }
 
-
 void computeBinary( std::string opName, ExpressionNode* left,
 		ExpressionNode* right, Cedomp::Type::TypeCode& exprType,
 		Cedomp::Type::TypeCode& genericType )
@@ -222,9 +221,10 @@ void computeBinary( std::string opName, ExpressionNode* left,
 			}
 			else
 			{
-				if(left->getGenericTypeCode() != right->getGenericTypeCode())
+				if (left->getGenericTypeCode() != right->getGenericTypeCode())
 				{
-					right->setCoercion(left->getTypeCode(), left->getGenericTypeCode());
+					right->setCoercion(left->getTypeCode(),
+							left->getGenericTypeCode());
 				}
 				genericTypeCode = left->getGenericTypeCode();
 			}
@@ -445,4 +445,18 @@ ExpressionNode * Cedomp::Semantic::ComputeLess( ExpressionNode * left,
 ExpressionNode * Cedomp::Semantic::ComputeEnclosed( ExpressionNode * val )
 {
 	return new EmbracedExpression(val);
+}
+
+ExpressionNode* Cedomp::Semantic::ComputeLenght( ExpressionNode* val )
+{
+	std::string opName("len");
+	auto& operation = Cedomp::Type::Operation::getInstance();
+	Cedomp::Type::TypeCode checker;
+	operation.getReturnUnaryType(val->getTypeCode(), opName, checker);
+	if (checker == Cedomp::Type::BaseType::TYPEERROR)
+	{
+		throw UnaryOperationNotSupported(opName, val->getTypeCode());
+	}
+	//Return node here
+	return new LenNode(checker, val);
 }

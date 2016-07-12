@@ -72,6 +72,12 @@ namespace Cedomp
 			std::unique_ptr<BlockNode> body;
 		};
 
+		class FunctionNode: public StatementNode
+		{
+		public:
+			//TODO
+		};
+
 	}
 }
 

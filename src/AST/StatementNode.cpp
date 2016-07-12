@@ -62,8 +62,15 @@ void AssignVariableNode::printNode() const
 		if (varSymbol)
 		{
 			auto typeName = Cedomp::Type::Type::getTypeName(varSymbol->type);
-			std::cout << "assigning var {type:" << typeName << "} " << id
-					<< "[";
+			std::cout << "assigning var {type:" << typeName;
+			auto varTypeGeneric = varSymbol->genericType;
+			if (varTypeGeneric != Cedomp::Type::TYPEGENERIC
+					&& varTypeGeneric != Cedomp::Type::TYPEERROR)
+			{
+				std::cout << ":"
+						<< Cedomp::Type::Type::getTypeName(varTypeGeneric);
+			}
+			std::cout << "} " << id << "[";
 			index->printNode();
 			std::cout << "] = ";
 		}
@@ -115,7 +122,7 @@ IfNode::IfNode( ExpressionNode* condition, BlockNode* thenBody,
 
 void IfNode::printNode() const
 {
-	std::cout << "If ";
+	std::cout << "if ";
 	condition->printNode();
 	if (thenBody)
 	{

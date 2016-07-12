@@ -64,6 +64,8 @@ namespace Cedomp
 
 		AST::ExpressionNode* ComputeEnclosed(AST::ExpressionNode* val);
 
+		AST::ExpressionNode* ComputeLenght(AST::ExpressionNode* val);
+
 		//TODO: Function call
 
 	}

@@ -25,6 +25,8 @@ namespace Cedomp
 			virtual ~ExpressionNode() = default;
 			Type::TypeCode getTypeCode() const;
 			Type::TypeCode getGenericTypeCode() const;
+			Type::TypeCode getCoercionTypeCode() const;
+			Type::TypeCode getCoercionGenericTypeCode() const;
 			void setGenericTypeCode( Type::TypeCode generic );
 			void setCoercion( Type::TypeCode type, Type::TypeCode genericType );
 			virtual void printNode() const;
@@ -288,8 +290,17 @@ namespace Cedomp
 		public:
 			EmbracedExpression( ExpressionNode* exprNode );
 			virtual void printExpressionValue() const;
+			void printNode() const;
 		private:
 			std::unique_ptr<ExpressionNode> exprNode;
+		};
+
+		class LenNode: public UnaryOperationNode
+		{
+		public:
+			LenNode( Cedomp::Type::TypeCode type, ExpressionNode* expr );
+		protected:
+			virtual void printOpName() const;
 		};
 
 	}

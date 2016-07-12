@@ -60,6 +60,9 @@ std::map<TypeCode, std::set<TypeCode>> createCompatibilityMap()
 	ret[TYPEINT].insert(TYPEFLOAT);
 	ret[TYPEFLOAT].insert(TYPEINT);
 	ret[TYPEBOOL].insert(TYPEINT);
+	ret[TYPESTRING].insert(TYPEBOOL);
+	ret[TYPESTRING].insert(TYPEINT);
+	ret[TYPESTRING].insert(TYPEFLOAT);
 	return ret;
 }
 

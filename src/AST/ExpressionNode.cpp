@@ -16,9 +16,10 @@ void ExpressionNode::printNode() const
 	{
 		auto coercionTypeName = Cedomp::Type::Type::getTypeName(coercionType);
 		std::cout << "(" << coercionTypeName;
-		if(coercionGenericType != Cedomp::Type::TYPEGENERIC)
+		if (coercionGenericType != Cedomp::Type::TYPEGENERIC)
 		{
-			std::cout <<":" << Cedomp::Type::Type::getTypeName(coercionGenericType);
+			std::cout << ":"
+					<< Cedomp::Type::Type::getTypeName(coercionGenericType);
 		}
 		std::cout << ") ";
 	}
@@ -32,6 +33,15 @@ void ExpressionNode::printNode() const
 	std::cout << " ";
 	printExpressionValue();
 	std::cout << "}";
+}
+
+Cedomp::Type::TypeCode ExpressionNode::getCoercionTypeCode() const
+{
+	return coercionType;
+}
+Cedomp::Type::TypeCode ExpressionNode::getCoercionGenericTypeCode() const
+{
+	return coercionGenericType;
 }
 
 ExpressionNode::ExpressionNode( Type::TypeCode type ) :
@@ -368,12 +378,30 @@ EmbracedExpression::EmbracedExpression( ExpressionNode* exprNode ) :
 		ExpressionNode(exprNode->getTypeCode()), exprNode(exprNode)
 {
 	setGenericTypeCode(exprNode->getGenericTypeCode());
+	setCoercion(exprNode->getCoercionTypeCode(),
+			exprNode->getCoercionGenericTypeCode());
+}
+
+void EmbracedExpression::printNode() const
+{
+	std::cout << "(";
+	ExpressionNode::printNode();
+	std::cout << ")";
 }
 
 void EmbracedExpression::printExpressionValue() const
 {
-	std::cout << "(";
+
 	exprNode->printNode();
-	std::cout << ")";
+}
+
+LenNode::LenNode( Cedomp::Type::TypeCode type, ExpressionNode* expr ) :
+		UnaryOperationNode(type, expr)
+{
+}
+
+void LenNode::printOpName() const
+{
+	std::cout << "len";
 }
 

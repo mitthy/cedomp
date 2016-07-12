@@ -7,6 +7,7 @@
     #include "Semantic/Statement.h"
     #include "Semantic/Expression.h"
     #include "Semantic/Utility.h"
+    #include "Semantic/Function.h"
     #include "AST/AST.h"
     #include "Exceptions/CedompException.h"
     extern int yylex();
@@ -38,14 +39,24 @@
     Cedomp::AST::AbstractNode* typeforstat;
     Cedomp::AST::ExpressionNode* typefor_cond;
     Cedomp::AST::BlockNode* typefor_body;
+    Cedomp::AST::AbstractNode* typedeclfun;
+    Cedomp::Semantic::FunctionInfo* typeaddtoscope;
+    Cedomp::AST::BlockNode* typedeclfuntail;
+    Cedomp::AST::BlockNode* typefuncbody;
+    std::vector<Cedomp::AST::VariableNode*>* typearglist;
 }
 
 %token T_NL
 %token T_SEMICOLON T_COMMA T_LEFT_PAR T_RIGHT_PAR T_LEFT_BRACKET T_RIGHT_BRACKET  T_ASSIGN T_COLON
 %token T_MAP T_LIST T_TRUE T_FALSE T_STRING T_ID T_INT T_FLOAT
 %token T_DEF T_END T_RETURN T_FOR T_IF T_ELSE
-%token T_AND T_XOR T_OR T_MOD T_NOT T_EQUALS T_DIFFERENT T_GREATER_EQUAL T_LESS_EQUAL T_GREATER T_LESS T_PLUS T_STAR T_SLASH T_MINUS
+%token T_AND T_XOR T_OR T_MOD T_NOT T_EQUALS T_DIFFERENT T_GREATER_EQUAL T_LESS_EQUAL T_GREATER T_LESS T_PLUS T_STAR T_SLASH T_MINUS T_LEN
 
+%type<typearglist> arglist
+%type<typefuncbody> funcbody
+%type<typedeclfuntail> declfuntail
+%type<typeaddtoscope> addtoscope
+%type<typedeclfun> declfun
 %type<typefor_cond> for_cond
 %type<typefor_body> for_body
 %type<typeforstat> forstat
@@ -76,6 +87,7 @@
 %left T_PLUS T_MINUS
 %left T_STAR T_SLASH T_MOD
 %left UNARY_MINUS
+%left T_LEN
 
 
 %%
@@ -130,10 +142,12 @@ statement T_NL
 |
 T_NL
 {
+    //Ignore
 }
 |
 statements T_NL
 {
+    //Ignore
 }
 |
 error T_NL
@@ -303,11 +317,33 @@ statements
 ;
 
 declfun:
-T_DEF T_ID T_LEFT_PAR arglist T_RIGHT_PAR T_COLON T_NL declfuntail
+addtoscope declfuntail
+{
+    if($1 == nullptr || $2 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::CreateFunction($1, $2);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
+}
+;
+
+addtoscope:
+T_DEF T_ID createscope T_LEFT_PAR arglist T_RIGHT_PAR T_COLON T_NL
 {
 }
 |
-T_DEF T_ID T_LEFT_PAR T_RIGHT_PAR T_COLON T_NL declfuntail
+T_DEF T_ID createscope T_LEFT_PAR T_RIGHT_PAR T_COLON T_NL
 {
 }
 ;
@@ -323,7 +359,7 @@ expr
 ;
 
 declfuntail:
-funcbody T_END
+funcbody destroyscope T_END
 {
 }
 ;
@@ -840,6 +876,26 @@ T_LEFT_PAR expr T_RIGHT_PAR
         try
         {
             $$ = Cedomp::Semantic::ComputeEnclosed($2);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
+}
+|
+T_LEN expr
+{
+    if($2 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::ComputeLenght($2);
         }
         catch(Cedomp::Exceptions::CedompException& e)
         {

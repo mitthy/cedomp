@@ -7,6 +7,7 @@
     #include <vector>
     #include "Semantic/VarAssign.h"
     #include "Semantic/Statement.h"
+    #include "Semantic/Function.h"
     #include "Semantic/Expression.h"
     #include "Exceptions/CedompException.h"
     #include "AST/AST.h"
@@ -51,6 +52,10 @@
 
 "if" {
     return T_IF;
+}
+
+"len" {
+    return T_LEN;
 }
 
 "map" {
