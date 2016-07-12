@@ -11,7 +11,9 @@
 #include "BasicNode.h"
 #include "ExpressionNode.h"
 #include <memory>
+#include "Scope/Scope.h"
 #include <vector>
+
 
 namespace Cedomp
 {
@@ -35,6 +37,7 @@ namespace Cedomp
 			std::string id;
 			std::unique_ptr<ExpressionNode> expr;
 			std::unique_ptr<ExpressionNode> index;
+			Cedomp::Scope::ScopeNode* scope;
 		};
 
 		class AssignBlockNode: public AbstractNode
@@ -44,6 +47,29 @@ namespace Cedomp
 			virtual void printNode() const;
 		private:
 			std::vector<std::unique_ptr<AssignVariableNode>> nodes;
+		};
+
+		class IfNode: public StatementNode
+		{
+		public:
+			IfNode(ExpressionNode* condition);
+			IfNode(ExpressionNode* condition, BlockNode* thenBody);
+			IfNode(ExpressionNode* condition, BlockNode* thenBody, BlockNode* elseBody);
+			virtual void printNode() const;
+		private:
+			std::unique_ptr<ExpressionNode> condition;
+			std::unique_ptr<BlockNode> thenBody;
+			std::unique_ptr<BlockNode> elseBody;
+		};
+
+		class WhileNode: public StatementNode
+		{
+		public:
+			WhileNode(ExpressionNode* condition, BlockNode* body);
+			virtual void printNode() const;
+		private:
+			std::unique_ptr<ExpressionNode> condition;
+			std::unique_ptr<BlockNode> body;
 		};
 
 	}

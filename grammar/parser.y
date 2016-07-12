@@ -6,6 +6,7 @@
     #include "Semantic/VarAssign.h"
     #include "Semantic/Statement.h"
     #include "Semantic/Expression.h"
+    #include "Semantic/Utility.h"
     #include "AST/AST.h"
     #include "Exceptions/CedompException.h"
     extern int yylex();
@@ -32,6 +33,11 @@
     Cedomp::AST::BlockNode* typehead;
     Cedomp::AST::BlockNode* typestatements;
     Cedomp::AST::AbstractNode* typestatement;
+    Cedomp::AST::AbstractNode* typeifstat;
+    Cedomp::AST::BlockNode* typeifstatements;
+    Cedomp::AST::AbstractNode* typeforstat;
+    Cedomp::AST::ExpressionNode* typefor_cond;
+    Cedomp::AST::BlockNode* typefor_body;
 }
 
 %token T_NL
@@ -40,6 +46,11 @@
 %token T_DEF T_END T_RETURN T_FOR T_IF T_ELSE
 %token T_AND T_XOR T_OR T_MOD T_NOT T_EQUALS T_DIFFERENT T_GREATER_EQUAL T_LESS_EQUAL T_GREATER T_LESS T_PLUS T_STAR T_SLASH T_MINUS
 
+%type<typefor_cond> for_cond
+%type<typefor_body> for_body
+%type<typeforstat> forstat
+%type<typeifstatements> ifstatements
+%type<typeifstat> ifstat
 %type<typehead> head
 %type<typestatements> statements
 %type<typestatement> statement
@@ -72,7 +83,20 @@
 head:
 statements
 {
-    $$ = $1;
+    if($1)
+    {
+        $$ = $1;
+    }
+    else
+    {
+        $$ = new Cedomp::AST::BlockNode();
+    }
+    root = $$;
+}
+|
+%empty
+{
+    $$ = new Cedomp::AST::BlockNode();
     root = $$;
 }
 ;
@@ -106,12 +130,10 @@ statement T_NL
 |
 T_NL
 {
-    //Skip
 }
 |
 statements T_NL
 {
-    //Skip
 }
 |
 error T_NL
@@ -127,6 +149,22 @@ declfun
 |
 expr
 {
+    if($1 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::ExpressionStatement($1);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 |
 ifstat
@@ -163,54 +201,104 @@ varassign
 ;
 
 forstat:
-T_FOR T_LEFT_PAR for_init T_SEMICOLON for_cond T_SEMICOLON for_expr T_RIGHT_PAR T_COLON T_NL for_body T_END
+T_FOR for_cond T_COLON T_NL createscope for_body destroyscope T_END
 {
-}
-;
-
-for_init:
-expr
-{
-}
-|
-%empty
-{
+    if($2 == nullptr || $6 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::ParseFor($2, $6);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 ;
 
 for_cond:
 expr
 {
+    $$ = $1;
 }
 |
 %empty
 {
-}
-;
-
-for_expr:
-expr
-{
-}
-|
-%empty
-{
+    bool* val = new bool;
+    *val = true;
+    $$ = new Cedomp::AST::BoolNode(val);
 }
 ;
 
 for_body:
 statements
 {
+    $$ = $1;
+}
+|
+%empty
+{
+    $$ = new Cedomp::AST::BlockNode();
 }
 ;
 
 ifstat:
-T_IF expr T_COLON T_NL statements T_END
+T_IF expr T_COLON T_NL createscope ifstatements destroyscope T_END
 {
+    if($2 == nullptr || $6 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::IfStatement($2, $6);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 |
-T_IF expr T_COLON T_NL statements T_ELSE T_COLON T_NL statements T_END
+T_IF expr T_COLON T_NL createscope ifstatements destroyscope T_ELSE T_COLON T_NL createscope ifstatements destroyscope T_END
 {
+    if($2 == nullptr || $6 == nullptr || $12 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::IfStatement($2, $6, $12);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
+}
+;
+
+ifstatements:
+%empty
+{
+    $$ = new Cedomp::AST::BlockNode();
+}
+|
+statements
+{
+    $$ = $1;
 }
 ;
 
@@ -930,6 +1018,20 @@ expr
         }
     }
 }   
+;
+
+createscope:
+%empty
+{
+    Cedomp::Semantic::CreateScope();
+}
+;
+
+destroyscope:
+%empty
+{
+    Cedomp::Semantic::DestroyScope();
+}
 ;
 
 %%

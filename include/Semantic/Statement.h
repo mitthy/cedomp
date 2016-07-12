@@ -18,6 +18,14 @@ namespace Cedomp
 
 		AST::BlockNode* AddStatement(AST::BlockNode* block, AST::AbstractNode* statement);
 
+		AST::AbstractNode* ExpressionStatement(AST::ExpressionNode* expr);
+
+		AST::AbstractNode* IfStatement(AST::ExpressionNode* condition, AST::BlockNode* body);
+
+		AST::AbstractNode* IfStatement(AST::ExpressionNode* condition, AST::BlockNode* body, AST::BlockNode* elseBody);
+
+		AST::AbstractNode* ParseFor(AST::ExpressionNode* condition, AST::BlockNode* body);
+
 	}
 }
 

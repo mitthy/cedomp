@@ -45,7 +45,7 @@
     return T_RETURN;
 }
 
-"for" {
+"while" {
     return T_FOR;
 }
 

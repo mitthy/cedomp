@@ -8,7 +8,8 @@
 #ifndef SCOPE_H_
 #define SCOPE_H_
 #include "Type/Types.h"
-#include "AST/AST.h"
+#include "AST/BasicNode.h"
+#include "AST/ExpressionNode.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -46,9 +47,13 @@ namespace Cedomp
 			ScopeNode* previousNode();
 			ScopeNode( const ScopeNode& rhs ) = delete;
 			ScopeNode& operator=( const ScopeNode& rhs ) = delete;
-			~ScopeNode() = default;
+			void generateScope( ScopeNode** curentScope );
+			void destroyScope( ScopeNode** currentScope );
+			variableInfo* searchScope( const std::string& varName );
+			~ScopeNode();
 		private:
 			ScopeNode* previous;
+			std::vector<ScopeNode*> children;
 			std::map<std::string, variableInfo> variableValMap;
 		};
 
@@ -59,12 +64,14 @@ namespace Cedomp
 			Scope( const Scope& rhs ) = delete;
 			Scope& operator=( const Scope& rhs ) = delete;
 			void addToScope( const std::string& name,
-					const Type::TypeCode& varType);
+					const Type::TypeCode& varType );
 			~Scope();
 			void generateScope();
 			variableInfo* searchScope( const std::string& varName );
 			variableInfo* searchCurrentScope( const std::string& varName );
 			bool deleteScope();
+			ScopeNode* getCurrentScope();
+
 		private:
 			Scope();
 			ScopeNode* globalScope;

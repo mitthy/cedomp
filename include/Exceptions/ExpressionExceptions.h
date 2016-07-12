@@ -64,6 +64,7 @@ namespace Cedomp
 			std::string opName;
 			Cedomp::Type::TypeCode type;
 		};
+
 	}
 }
 

@@ -161,6 +161,14 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 									varSymbol->genericType,
 									(*valBeg)->getTypeCode());
 						}
+						else
+						{
+							if (varSymbol->genericType
+									!= (*valBeg)->getTypeCode())
+							{
+								(*valBeg)->setCoercion(varSymbol->genericType);
+							}
+						}
 					}
 				}
 			}
@@ -178,7 +186,12 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 				}
 				else
 				{
+
 					varSymbol->genericType = (*valBeg)->getGenericTypeCode();
+				}
+				if (varSymbol->type != (*valBeg)->getTypeCode())
+				{
+					(*valBeg)->setCoercion(varSymbol->type);
 				}
 			}
 		}

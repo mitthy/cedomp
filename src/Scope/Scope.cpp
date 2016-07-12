@@ -39,7 +39,7 @@ ScopeNode::ScopeNode( ScopeNode* previous ) :
 {
 }
 
-void ScopeNode::addToScope( const std::string& name, const TypeCode& varType)
+void ScopeNode::addToScope( const std::string& name, const TypeCode& varType )
 {
 	variableInfo varInfo;
 	varInfo.type = varType;
@@ -75,17 +75,49 @@ Scope::Scope() :
 {
 }
 
+ScopeNode* Scope::getCurrentScope()
+{
+	return tail;
+}
+
+void ScopeNode::generateScope( ScopeNode** currentScope )
+{
+	ScopeNode* newScope = new ScopeNode(this);
+	this->children.push_back(newScope);
+	*currentScope = newScope;
+}
+
+void ScopeNode::destroyScope( ScopeNode** currentScope )
+{
+	if (this->previous != nullptr)
+	{
+		*currentScope = previous;
+	}
+}
+variableInfo* ScopeNode::searchScope( const std::string& varName )
+{
+	variableInfo* varInfo = nullptr;
+	searchScope(varName, &varInfo);
+	return varInfo;
+}
+
+ScopeNode::~ScopeNode()
+{
+	for(auto child : children)
+	{
+		delete child;
+	}
+}
+
 Scope::~Scope()
 {
-	while (deleteScope())
-		;
 	delete globalScope;
 }
 
+
 void Scope::generateScope()
 {
-	ScopeNode* next = new ScopeNode(tail);
-	tail = next;
+	tail->generateScope(&tail);
 }
 
 variableInfo* Scope::searchScope( const std::string& varName )
@@ -97,14 +129,7 @@ variableInfo* Scope::searchScope( const std::string& varName )
 
 bool Scope::deleteScope()
 {
-	if (tail != globalScope)
-	{
-		ScopeNode* temp = tail->previousNode();
-		delete tail;
-		tail = temp;
-		return true;
-	}
-	return false;
+	tail->destroyScope(&tail);
 }
 
 FunctionScope::FunctionScope() :
@@ -163,7 +188,7 @@ functionInfo* FunctionScope::searchScope( const std::string& funcName )
 
 void Scope::addToScope( const std::string& name, const TypeCode& varType )
 {
-	tail->addToScope(name, varType );
+	tail->addToScope(name, varType);
 }
 
 std::map<std::string, functionInfo>::iterator FunctionScope::begin()

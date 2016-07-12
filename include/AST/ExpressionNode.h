@@ -25,11 +25,13 @@ namespace Cedomp
 			virtual ~ExpressionNode() = default;
 			Type::TypeCode getTypeCode() const;
 			Type::TypeCode getGenericTypeCode() const;
-			void setGenericTypeCode(Type::TypeCode generic);
+			void setGenericTypeCode( Type::TypeCode generic );
+			void setCoercion( Type::TypeCode type );
 			virtual void printNode() const;
 		protected:
 			Type::TypeCode type;
 			Type::TypeCode genericTypeCode;
+			Type::TypeCode coercionType;
 			virtual void printExpressionValue() const = 0;
 		};
 
@@ -119,20 +121,19 @@ namespace Cedomp
 		{
 		public:
 			BinaryOperationNode( Cedomp::Type::TypeCode type,
-					ExpressionNode* lhs, ExpressionNode* rhs, bool coercion );
+					ExpressionNode* lhs, ExpressionNode* rhs );
 		protected:
 			virtual void printExpressionValue() const;
 			virtual void printOpName() const = 0;
 			std::unique_ptr<ExpressionNode> lhs;
 			std::unique_ptr<ExpressionNode> rhs;
-			bool coercion;
 		};
 
 		class ModNode: public BinaryOperationNode
 		{
 		public:
 			ModNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -141,7 +142,7 @@ namespace Cedomp
 		{
 		public:
 			AdditionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -150,7 +151,7 @@ namespace Cedomp
 		{
 		public:
 			SubtractionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -159,7 +160,7 @@ namespace Cedomp
 		{
 		public:
 			MultiplicationNode( Cedomp::Type::TypeCode type,
-					ExpressionNode* lhs, ExpressionNode* rhs, bool coercion );
+					ExpressionNode* lhs, ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -168,7 +169,7 @@ namespace Cedomp
 		{
 		public:
 			DivisionNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -177,7 +178,7 @@ namespace Cedomp
 		{
 		public:
 			EqualsNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -186,7 +187,7 @@ namespace Cedomp
 		{
 		public:
 			DifferentNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -195,7 +196,7 @@ namespace Cedomp
 		{
 		public:
 			GreaterNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -204,7 +205,7 @@ namespace Cedomp
 		{
 		public:
 			LessNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -213,7 +214,7 @@ namespace Cedomp
 		{
 		public:
 			GreaterEqualNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -222,7 +223,7 @@ namespace Cedomp
 		{
 		public:
 			LessEqualNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -231,7 +232,7 @@ namespace Cedomp
 		{
 		public:
 			AndNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -240,7 +241,7 @@ namespace Cedomp
 		{
 		public:
 			OrNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -249,7 +250,7 @@ namespace Cedomp
 		{
 		public:
 			XorNode( Cedomp::Type::TypeCode type, ExpressionNode* lhs,
-					ExpressionNode* rhs, bool coercion );
+					ExpressionNode* rhs );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -268,8 +269,7 @@ namespace Cedomp
 		class UnaryMinusNode: public UnaryOperationNode
 		{
 		public:
-			UnaryMinusNode( Cedomp::Type::TypeCode type,
-					ExpressionNode* expr );
+			UnaryMinusNode( Cedomp::Type::TypeCode type, ExpressionNode* expr );
 		protected:
 			virtual void printOpName() const;
 		};
@@ -277,10 +277,18 @@ namespace Cedomp
 		class NotNode: public UnaryOperationNode
 		{
 		public:
-			NotNode( Cedomp::Type::TypeCode type,
-					ExpressionNode* expr );
+			NotNode( Cedomp::Type::TypeCode type, ExpressionNode* expr );
 		protected:
 			virtual void printOpName() const;
+		};
+
+		class EmbracedExpression: public ExpressionNode
+		{
+		public:
+			EmbracedExpression( ExpressionNode* exprNode );
+			virtual void printExpressionValue() const;
+		private:
+			std::unique_ptr<ExpressionNode> exprNode;
 		};
 
 	}

@@ -1,7 +1,8 @@
 NAME=../cedomp
 SRC=main.cpp Scope/Scope.cpp Semantic/VarAssign.cpp Type/Types.cpp Exceptions/VarAssignExceptions.cpp AST/BasicNode.cpp \
 	Exceptions/TypeExceptions.cpp Exceptions/CedompException.cpp AST/ExpressionNode.cpp AST/StatementNode.cpp \
-	Semantic/Statement.cpp Type/Operations.cpp Semantic/Expression.cpp Exceptions/ExpressionException.cpp
+	Semantic/Statement.cpp Type/Operations.cpp Semantic/Expression.cpp Exceptions/ExpressionException.cpp \
+	Semantic/Utility.cpp
 BISON=bison
 FLEX=flex
 CC=g++

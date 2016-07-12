@@ -112,7 +112,7 @@ ExpressionNode* Cedomp::Semantic::ComputeIndex( char * id, ExpressionNode* val )
 }
 
 void computeBinary( std::string opName, ExpressionNode* left,
-		ExpressionNode* right, Cedomp::Type::TypeCode& exprType, bool& coercion,
+		ExpressionNode* right, Cedomp::Type::TypeCode& exprType,
 		Cedomp::Type::TypeCode& genericType )
 {
 	auto& operation = Cedomp::Type::Operation::getInstance();
@@ -148,7 +148,10 @@ void computeBinary( std::string opName, ExpressionNode* left,
 							left->getGenericTypeCode(), right->getTypeCode()))
 					{
 						genericTypeCode = left->getGenericTypeCode();
-						coercion = true;
+						if (genericTypeCode != right->getTypeCode())
+						{
+							right->setCoercion(genericTypeCode);
+						}
 					}
 					else
 					{
@@ -162,7 +165,7 @@ void computeBinary( std::string opName, ExpressionNode* left,
 			else
 			{
 				//Coercion successful
-				coercion = true;
+				right->setCoercion(left->getTypeCode());
 			}
 		}
 		else
@@ -185,7 +188,10 @@ void computeBinary( std::string opName, ExpressionNode* left,
 						left->getGenericTypeCode(), right->getTypeCode()))
 				{
 					genericTypeCode = left->getGenericTypeCode();
-					coercion = true;
+					if (genericTypeCode != right->getTypeCode())
+					{
+						right->setCoercion(genericTypeCode);
+					}
 				}
 				else
 				{
@@ -203,12 +209,11 @@ ExpressionNode* Cedomp::Semantic::ComputeMod( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("mod");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	ModNode* ret = new ModNode(exprType, left, right, coercion);
+	ModNode* ret = new ModNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -217,12 +222,11 @@ ExpressionNode* Cedomp::Semantic::ComputeAddition( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("+");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	AdditionNode* ret = new AdditionNode(exprType, left, right, coercion);
+	AdditionNode* ret = new AdditionNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 
@@ -232,12 +236,11 @@ ExpressionNode* Cedomp::Semantic::ComputeSubtraction( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("-");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	SubtractionNode* ret = new SubtractionNode(exprType, left, right, coercion);
+	SubtractionNode* ret = new SubtractionNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -246,12 +249,11 @@ ExpressionNode* Cedomp::Semantic::ComputeMultiplication( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("*");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	MultiplicationNode* ret = new MultiplicationNode(exprType, left, right, coercion);
+	MultiplicationNode* ret = new MultiplicationNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -260,12 +262,11 @@ ExpressionNode* Cedomp::Semantic::ComputeDivision( ExpressionNode* left,
 		ExpressionNode* right )
 {
 	std::string opName("/");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	DivisionNode* ret = new DivisionNode(exprType, left, right, coercion);
+	DivisionNode* ret = new DivisionNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -288,12 +289,11 @@ ExpressionNode * Cedomp::Semantic::ComputeGreaterThan( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName(">");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	GreaterNode* ret = new GreaterNode(exprType, left, right, coercion);
+	GreaterNode* ret = new GreaterNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -302,11 +302,10 @@ ExpressionNode * Cedomp::Semantic::ComputeEquals( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("==");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
-	EqualsNode* ret = new EqualsNode(exprType, left, right, coercion);
+	computeBinary(opName, left, right, exprType, genericType);
+	EqualsNode* ret = new EqualsNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -315,12 +314,11 @@ ExpressionNode * Cedomp::Semantic::ComputeDifferent( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("!=");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	DifferentNode* ret = new DifferentNode(exprType, left, right, coercion);
+	DifferentNode* ret = new DifferentNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -329,12 +327,11 @@ ExpressionNode * Cedomp::Semantic::ComputeGreaterEquals( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName(">=");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	GreaterEqualNode* ret = new GreaterEqualNode(exprType, left, right, coercion);
+	GreaterEqualNode* ret = new GreaterEqualNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -343,12 +340,11 @@ ExpressionNode * Cedomp::Semantic::ComputeAnd( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("and");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	AndNode* ret = new AndNode(exprType, left, right, coercion);
+	AndNode* ret = new AndNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -357,12 +353,11 @@ ExpressionNode * Cedomp::Semantic::ComputeXor( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("xor");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	XorNode* ret = new XorNode(exprType, left, right, coercion);
+	XorNode* ret = new XorNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -371,12 +366,11 @@ ExpressionNode * Cedomp::Semantic::ComputeOr( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("or");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
+	computeBinary(opName, left, right, exprType, genericType);
 	//Return new node here.
-	OrNode* ret = new OrNode(exprType, left, right, coercion);
+	OrNode* ret = new OrNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -399,11 +393,10 @@ ExpressionNode * Cedomp::Semantic::ComputeLessEqual( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("<=");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
-	LessEqualNode* ret = new LessEqualNode(exprType, left, right, coercion);
+	computeBinary(opName, left, right, exprType, genericType);
+	LessEqualNode* ret = new LessEqualNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
@@ -412,16 +405,15 @@ ExpressionNode * Cedomp::Semantic::ComputeLess( ExpressionNode * left,
 		ExpressionNode * right )
 {
 	std::string opName("<");
-	bool coercion = false;
 	Cedomp::Type::TypeCode exprType;
 	Cedomp::Type::TypeCode genericType;
-	computeBinary(opName, left, right, exprType, coercion, genericType);
-	LessNode* ret = new LessNode(exprType, left, right, coercion);
+	computeBinary(opName, left, right, exprType, genericType);
+	LessNode* ret = new LessNode(exprType, left, right);
 	ret->setGenericTypeCode(genericType);
 	return ret;
 }
 
 ExpressionNode * Cedomp::Semantic::ComputeEnclosed( ExpressionNode * val )
 {
-	return val;
+	return new EmbracedExpression(val);
 }
