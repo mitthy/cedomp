@@ -26,12 +26,13 @@ namespace Cedomp
 			Type::TypeCode getTypeCode() const;
 			Type::TypeCode getGenericTypeCode() const;
 			void setGenericTypeCode( Type::TypeCode generic );
-			void setCoercion( Type::TypeCode type );
+			void setCoercion( Type::TypeCode type, Type::TypeCode genericType );
 			virtual void printNode() const;
 		protected:
 			Type::TypeCode type;
 			Type::TypeCode genericTypeCode;
 			Type::TypeCode coercionType;
+			Type::TypeCode coercionGenericType;
 			virtual void printExpressionValue() const = 0;
 		};
 

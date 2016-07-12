@@ -221,6 +221,10 @@ void Operation::initializeBinaryOpMap()
 			BaseType::TYPELIST);
 	registerBinaryOperation(BaseType::TYPELIST, "+", BaseType::TYPEGENERIC,
 			BaseType::TYPELIST);
+	registerBinaryOperation(BaseType::TYPELIST, "+", BaseType::TYPELIST,
+				BaseType::TYPELIST);
+	registerBinaryOperation(BaseType::TYPELIST, "+=", BaseType::TYPELIST,
+					BaseType::TYPELIST);
 
 }
 

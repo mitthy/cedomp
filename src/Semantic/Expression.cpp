@@ -91,18 +91,23 @@ ExpressionNode* Cedomp::Semantic::ComputeIndex( char * id, ExpressionNode* val )
 		}
 		else
 		{
-			if (checker != Cedomp::Type::BaseType::TYPEGENERIC)
+			if (checker == Cedomp::Type::BaseType::TYPEGENERIC)
 			{
-				varSymbol->genericType = checker;
-			}
-			if (varSymbol->genericType == Cedomp::Type::BaseType::TYPEGENERIC)
-			{
-				throw Cedomp::Exceptions::ContainerTypeNotInitialized(name);
+				if (varSymbol->genericType
+						== Cedomp::Type::BaseType::TYPEGENERIC)
+				{
+					throw Cedomp::Exceptions::ContainerTypeNotInitialized(name);
+				}
+				else
+				{
+					return new IndexNode(varSymbol->genericType, name, val);
+				}
 			}
 			else
 			{
-				return new IndexNode(varSymbol->genericType, name, val);
+				return new IndexNode(varSymbol->type, name, val);
 			}
+
 		}
 	}
 	else
@@ -110,6 +115,7 @@ ExpressionNode* Cedomp::Semantic::ComputeIndex( char * id, ExpressionNode* val )
 		throw VariableNotDeclaredIndexedException(name);
 	}
 }
+
 
 void computeBinary( std::string opName, ExpressionNode* left,
 		ExpressionNode* right, Cedomp::Type::TypeCode& exprType,
@@ -150,7 +156,8 @@ void computeBinary( std::string opName, ExpressionNode* left,
 						genericTypeCode = left->getGenericTypeCode();
 						if (genericTypeCode != right->getTypeCode())
 						{
-							right->setCoercion(genericTypeCode);
+							right->setCoercion(genericTypeCode,
+									Cedomp::Type::TYPEGENERIC);
 						}
 					}
 					else
@@ -165,7 +172,8 @@ void computeBinary( std::string opName, ExpressionNode* left,
 			else
 			{
 				//Coercion successful
-				right->setCoercion(left->getTypeCode());
+				right->setCoercion(left->getTypeCode(),
+						Cedomp::Type::TYPEGENERIC);
 			}
 		}
 		else
@@ -190,7 +198,8 @@ void computeBinary( std::string opName, ExpressionNode* left,
 					genericTypeCode = left->getGenericTypeCode();
 					if (genericTypeCode != right->getTypeCode())
 					{
-						right->setCoercion(genericTypeCode);
+						right->setCoercion(genericTypeCode,
+								Cedomp::Type::TYPEGENERIC);
 					}
 				}
 				else
@@ -198,6 +207,26 @@ void computeBinary( std::string opName, ExpressionNode* left,
 					throw IncompatibleTypeException(left->getGenericTypeCode(),
 							right->getTypeCode());
 				}
+			}
+		}
+	}
+	else
+	{
+		if (left->getGenericTypeCode() != Cedomp::Type::TYPEGENERIC)
+		{
+			if (!Cedomp::Type::Type::isCompatible(left->getGenericTypeCode(),
+					right->getGenericTypeCode()))
+			{
+				throw IncompatibleTypeException(left->getGenericTypeCode(),
+						right->getGenericTypeCode());
+			}
+			else
+			{
+				if(left->getGenericTypeCode() != right->getGenericTypeCode())
+				{
+					right->setCoercion(left->getTypeCode(), left->getGenericTypeCode());
+				}
+				genericTypeCode = left->getGenericTypeCode();
 			}
 		}
 	}

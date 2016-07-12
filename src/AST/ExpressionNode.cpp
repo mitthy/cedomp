@@ -12,14 +12,20 @@ using namespace Cedomp::AST;
 
 void ExpressionNode::printNode() const
 {
-	if (coercionType != type)
+	if (coercionType != Cedomp::Type::TYPEGENERIC)
 	{
 		auto coercionTypeName = Cedomp::Type::Type::getTypeName(coercionType);
-		std::cout << "(" << coercionTypeName << ") ";
+		std::cout << "(" << coercionTypeName;
+		if(coercionGenericType != Cedomp::Type::TYPEGENERIC)
+		{
+			std::cout <<":" << Cedomp::Type::Type::getTypeName(coercionGenericType);
+		}
+		std::cout << ") ";
 	}
 	auto typeName = Cedomp::Type::Type::getTypeName(type);
 	std::cout << "{" << typeName << ":";
-	if(getGenericTypeCode() != Cedomp::Type::TYPEGENERIC && getGenericTypeCode() != Cedomp::Type::TYPEERROR)
+	if (getGenericTypeCode() != Cedomp::Type::TYPEGENERIC
+			&& getGenericTypeCode() != Cedomp::Type::TYPEERROR)
 	{
 		std::cout << Cedomp::Type::Type::getTypeName(genericTypeCode) << ":";
 	}
@@ -30,13 +36,16 @@ void ExpressionNode::printNode() const
 
 ExpressionNode::ExpressionNode( Type::TypeCode type ) :
 		type(type), genericTypeCode(Cedomp::Type::BaseType::TYPEGENERIC), coercionType(
-				type)
+				Cedomp::Type::TYPEGENERIC), coercionGenericType(
+				Cedomp::Type::BaseType::TYPEGENERIC)
 {
 }
 
-void ExpressionNode::setCoercion( Type::TypeCode type )
+void ExpressionNode::setCoercion( Type::TypeCode type,
+		Type::TypeCode genericType )
 {
 	coercionType = type;
+	coercionGenericType = genericType;
 }
 
 Cedomp::Type::TypeCode ExpressionNode::getTypeCode() const
@@ -62,7 +71,7 @@ VariableNode::VariableNode( std::string name, Type::TypeCode type ) :
 
 void VariableNode::printExpressionValue() const
 {
-	std::cout << "Var: " << varName;
+	std::cout << "var: " << varName;
 }
 
 IntegerNode::IntegerNode( long* val ) :

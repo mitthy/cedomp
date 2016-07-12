@@ -166,7 +166,7 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 							if (varSymbol->genericType
 									!= (*valBeg)->getTypeCode())
 							{
-								(*valBeg)->setCoercion(varSymbol->genericType);
+								(*valBeg)->setCoercion(varSymbol->genericType, Cedomp::Type::TYPEGENERIC);
 							}
 						}
 					}
@@ -183,6 +183,10 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 						throw IncompatibleTypeException(varSymbol->genericType,
 								(*valBeg)->getGenericTypeCode());
 					}
+					if((*valBeg)->getGenericTypeCode() != varSymbol->genericType)
+					{
+						(*valBeg)->setCoercion((*valBeg)->getTypeCode(), varSymbol->genericType);
+					}
 				}
 				else
 				{
@@ -191,7 +195,7 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 				}
 				if (varSymbol->type != (*valBeg)->getTypeCode())
 				{
-					(*valBeg)->setCoercion(varSymbol->type);
+					(*valBeg)->setCoercion(varSymbol->type, Cedomp::Type::TYPEGENERIC);
 				}
 			}
 		}

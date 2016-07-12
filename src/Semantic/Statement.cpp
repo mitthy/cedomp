@@ -62,7 +62,7 @@ AbstractNode* Cedomp::Semantic::IfStatement( ExpressionNode* condition,
 	}
 	if (condition->getTypeCode() != Cedomp::Type::TYPEBOOL)
 	{
-		condition->setCoercion(Cedomp::Type::TYPEBOOL);
+		condition->setCoercion(Cedomp::Type::TYPEBOOL, Cedomp::Type::TYPEGENERIC);
 	}
 	if (body == nullptr)
 	{
@@ -86,7 +86,7 @@ AbstractNode* Cedomp::Semantic::IfStatement( ExpressionNode* condition,
 	}
 	if (condition->getTypeCode() != Cedomp::Type::TYPEBOOL)
 	{
-		condition->setCoercion(Cedomp::Type::TYPEBOOL);
+		condition->setCoercion(Cedomp::Type::TYPEBOOL, Cedomp::Type::TYPEGENERIC);
 	}
 	if (body == nullptr)
 	{
@@ -111,7 +111,7 @@ AbstractNode* Cedomp::Semantic::ParseFor( ExpressionNode* condition,
 	}
 	if (condition->getTypeCode() != Cedomp::Type::TYPEBOOL)
 	{
-		condition->setCoercion(Cedomp::Type::TYPEBOOL);
+		condition->setCoercion(Cedomp::Type::TYPEBOOL, Cedomp::Type::TYPEGENERIC);
 	}
 	return new Cedomp::AST::WhileNode(condition, body);
 }

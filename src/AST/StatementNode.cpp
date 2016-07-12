@@ -43,8 +43,7 @@ void AssignVariableNode::printNode() const
 			std::cout << "assigning var " << "{type:"
 					<< Cedomp::Type::Type::getTypeName(type);
 			if (varTypeGeneric != Cedomp::Type::TYPEGENERIC
-					&& varTypeGeneric != Cedomp::Type::TYPEERROR
-					&& varTypeGeneric != varSymbol->type)
+					&& varTypeGeneric != Cedomp::Type::TYPEERROR)
 			{
 				std::cout << ":"
 						<< Cedomp::Type::Type::getTypeName(varTypeGeneric);
