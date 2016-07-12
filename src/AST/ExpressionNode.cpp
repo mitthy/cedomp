@@ -21,7 +21,7 @@ void ExpressionNode::printNode() const
 	std::cout << "{" << typeName << ":";
 	if(getGenericTypeCode() != Cedomp::Type::TYPEGENERIC && getGenericTypeCode() != Cedomp::Type::TYPEERROR)
 	{
-		std::cout << Cedomp::Type::Type::getTypeName(genericTypeCode);
+		std::cout << Cedomp::Type::Type::getTypeName(genericTypeCode) << ":";
 	}
 	std::cout << " ";
 	printExpressionValue();
