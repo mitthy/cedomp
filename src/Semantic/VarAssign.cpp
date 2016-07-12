@@ -115,7 +115,7 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 {
 	std::unique_ptr<std::vector<VarNameIndex>> idsRAII(ids);
 	std::vector<std::unique_ptr<ExpressionNode>> exprRAII;
-	for(auto node : (*values))
+	for (auto node : (*values))
 	{
 		exprRAII.push_back(std::unique_ptr<ExpressionNode>(node));
 	}
@@ -157,10 +157,28 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 								varSymbol->genericType,
 								(*valBeg)->getTypeCode()))
 						{
-							throw IncompatibleTypeException(varSymbol->genericType,
+							throw IncompatibleTypeException(
+									varSymbol->genericType,
 									(*valBeg)->getTypeCode());
 						}
 					}
+				}
+			}
+			else
+			{
+				if (varSymbol->genericType != Type::TYPEGENERIC)
+				{
+					if (!Cedomp::Type::Type::isCompatible(
+							varSymbol->genericType,
+							(*valBeg)->getGenericTypeCode()))
+					{
+						throw IncompatibleTypeException(varSymbol->genericType,
+								(*valBeg)->getGenericTypeCode());
+					}
+				}
+				else
+				{
+					varSymbol->genericType = (*valBeg)->getGenericTypeCode();
 				}
 			}
 		}
@@ -170,16 +188,18 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 					(*valBeg)->getTypeCode());
 		}
 		//THIS IS NOT EXCEPTION SAFE. SHOULD BE CHANGED ASAP
-		if(idBeg->index)
+		if (idBeg->index)
 		{
-			result->push_back(new AssignVariableNode(idBeg->varName, idBeg->index, *valBeg));
+			result->push_back(
+					new AssignVariableNode(idBeg->varName, idBeg->index,
+							*valBeg));
 		}
 		else
 		{
 			result->push_back(new AssignVariableNode(idBeg->varName, *valBeg));
 		}
 	}
-	for(auto& node: exprRAII)
+	for (auto& node : exprRAII)
 	{
 		node.release();
 	}
