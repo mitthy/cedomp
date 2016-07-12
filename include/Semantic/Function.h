@@ -7,17 +7,27 @@
 
 #ifndef FUNCTION_H_
 #define FUNCTION_H_
+#include "AST/AST.h"
+#include <vector>
+
 namespace Cedomp
 {
 	namespace Semantic
 	{
-		struct FunctionInfo {
+		struct FunctionInfo
+		{
 			std::string name;
 			std::vector<Cedomp::AST::VariableNode*>* args;
 		};
 
+		AST::FunctionNode* CreateFunction( FunctionInfo* functionInfo,
+				AST::BlockNode* body );
 
-		Cedomp::AST::FunctionNode* CreateFunction(FunctionInfo* functionInfo, Cedomp::AST::BlockNode* body);
+		std::vector<std::string>* ParseArgList(
+				std::vector<std::string>*, char* id );
+
+		FunctionInfo* AddFunctionToScope(char* name, std::vector<std::string>* args);
+
 	}
 }
 

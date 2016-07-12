@@ -43,7 +43,7 @@
     Cedomp::Semantic::FunctionInfo* typeaddtoscope;
     Cedomp::AST::BlockNode* typedeclfuntail;
     Cedomp::AST::BlockNode* typefuncbody;
-    std::vector<Cedomp::AST::VariableNode*>* typearglist;
+    std::vector<std::string>* typearglist;
 }
 
 %token T_NL
@@ -341,6 +341,22 @@ addtoscope declfuntail
 addtoscope:
 T_DEF T_ID createscope T_LEFT_PAR arglist T_RIGHT_PAR T_COLON T_NL
 {
+    if($2 == nullptr || $5 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::AddFunctionToScope($2, $5);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 |
 T_DEF T_ID createscope T_LEFT_PAR T_RIGHT_PAR T_COLON T_NL
@@ -349,12 +365,44 @@ T_DEF T_ID createscope T_LEFT_PAR T_RIGHT_PAR T_COLON T_NL
 ;
 
 arglist:
-arglist T_COMMA expr
+arglist T_COMMA T_ID
 {
+    if($1 == nullptr || $3 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::ParseArgList($1, $3);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 |
-expr
+T_ID
 {
+    if($1 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::ParseArgList(nullptr, $1);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 ;
 
