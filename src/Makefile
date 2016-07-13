@@ -2,13 +2,13 @@ NAME=../cedomp
 SRC=main.cpp Scope/Scope.cpp Semantic/VarAssign.cpp Type/Types.cpp Exceptions/VarAssignExceptions.cpp AST/BasicNode.cpp \
 	Exceptions/TypeExceptions.cpp Exceptions/CedompException.cpp AST/ExpressionNode.cpp AST/StatementNode.cpp \
 	Semantic/Statement.cpp Type/Operations.cpp Semantic/Expression.cpp Exceptions/ExpressionException.cpp \
-	Semantic/Utility.cpp Semantic/Function.cpp
+	Semantic/Utility.cpp Semantic/Function.cpp Exceptions/FunctionExceptions.cpp
 BISON=bison
 FLEX=flex
 CC=g++
 INCLUDE=-I../include -I ../grammar
 LIBS=-lfl
-CFLAGS=-Wall -std=c++11
+CFLAGS=-Wall -std=c++11 
 BISONSRCFILE=parser.tab.c
 LEXSRCFILE=lex.yy.c
 OBJS=$(SRC:.cpp=.o)

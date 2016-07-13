@@ -12,11 +12,14 @@ namespace Cedomp
 {
 	namespace AST
 	{
+		class ExpressionNode;
+
 		class AbstractNode
 		{
 		public:
 			virtual void printNode() const = 0;
 			virtual ~AbstractNode() = default;
+			virtual void searchReturnValue(std::vector<ExpressionNode*>& output) const;
 		};
 
 		class BlockNode: public AbstractNode
@@ -25,6 +28,7 @@ namespace Cedomp
 			void addNode( AbstractNode* node );
 			virtual void printNode() const;
 			virtual ~BlockNode();
+			virtual void searchReturnValue(std::vector<ExpressionNode*>& output) const;
 		private:
 			std::vector<AbstractNode*> nodes;
 		};

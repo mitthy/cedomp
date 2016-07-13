@@ -43,7 +43,7 @@
     Cedomp::Semantic::FunctionInfo* typeaddtoscope;
     Cedomp::AST::BlockNode* typedeclfuntail;
     Cedomp::AST::BlockNode* typefuncbody;
-    std::vector<std::string>* typearglist;
+    std::vector<Cedomp::AST::ExpressionNode*>* typearglist;
 }
 
 %token T_NL
@@ -159,6 +159,7 @@ error T_NL
 statement:
 declfun
 {
+    $$ = $1;
 }
 |
 expr
@@ -183,14 +184,32 @@ expr
 |
 ifstat
 {
+    $$ = $1;
 }
 |
 forstat
 {
+    $$ = $1;
 }
 |
 T_RETURN expr
 {
+    if($2 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::CheckReturnStatement($2);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 |
 varassign
@@ -214,10 +233,16 @@ varassign
 }
 ;
 
-forstat:
-T_FOR for_cond T_COLON T_NL createscope for_body destroyscope T_END
+forcontext:
 {
-    if($2 == nullptr || $6 == nullptr)
+    Cedomp::Semantic::ChangeContext(Cedomp::Semantic::WHILE);
+}
+;
+
+forstat:
+T_FOR forcontext for_cond T_COLON T_NL createscope for_body destroyscope restorecontext T_END
+{
+    if($3 == nullptr || $7 == nullptr)
     {
         $$ = nullptr;
     }
@@ -225,7 +250,7 @@ T_FOR for_cond T_COLON T_NL createscope for_body destroyscope T_END
     {
         try
         {
-            $$ = Cedomp::Semantic::ParseFor($2, $6);
+            $$ = Cedomp::Semantic::ParseFor($3, $7);
         }
         catch(Cedomp::Exceptions::CedompException& e)
         {
@@ -262,10 +287,17 @@ statements
 }
 ;
 
-ifstat:
-T_IF expr T_COLON T_NL createscope ifstatements destroyscope T_END
+ifcontext:
+%empty
 {
-    if($2 == nullptr || $6 == nullptr)
+    Cedomp::Semantic::ChangeContext(Cedomp::Semantic::IF);
+}
+;
+
+ifstat:
+T_IF ifcontext expr T_COLON T_NL createscope ifstatements destroyscope restorecontext T_END
+{
+    if($3 == nullptr || $7 == nullptr)
     {
         $$ = nullptr;
     }
@@ -273,7 +305,7 @@ T_IF expr T_COLON T_NL createscope ifstatements destroyscope T_END
     {
         try
         {
-            $$ = Cedomp::Semantic::IfStatement($2, $6);
+            $$ = Cedomp::Semantic::IfStatement($3, $7);
         }
         catch(Cedomp::Exceptions::CedompException& e)
         {
@@ -283,9 +315,9 @@ T_IF expr T_COLON T_NL createscope ifstatements destroyscope T_END
     }
 }
 |
-T_IF expr T_COLON T_NL createscope ifstatements destroyscope T_ELSE T_COLON T_NL createscope ifstatements destroyscope T_END
+T_IF ifcontext expr T_COLON T_NL createscope ifstatements destroyscope T_ELSE T_COLON T_NL createscope ifstatements destroyscope restorecontext T_END
 {
-    if($2 == nullptr || $6 == nullptr || $12 == nullptr)
+    if($3 == nullptr || $7 == nullptr || $13 == nullptr)
     {
         $$ = nullptr;
     }
@@ -293,7 +325,7 @@ T_IF expr T_COLON T_NL createscope ifstatements destroyscope T_ELSE T_COLON T_NL
     {
         try
         {
-            $$ = Cedomp::Semantic::IfStatement($2, $6, $12);
+            $$ = Cedomp::Semantic::IfStatement($3, $7, $13);
         }
         catch(Cedomp::Exceptions::CedompException& e)
         {
@@ -316,10 +348,17 @@ statements
 }
 ;
 
-declfun:
-addtoscope declfuntail
+declfuncontext:
+%empty
 {
-    if($1 == nullptr || $2 == nullptr)
+    Cedomp::Semantic::ChangeContext(Cedomp::Semantic::DECLFUN);
+}
+;
+
+declfun:
+declfuncontext addtoscope restorecontext declfuntail
+{
+    if($2 == nullptr || $4 == nullptr)
     {
         $$ = nullptr;
     }
@@ -327,7 +366,7 @@ addtoscope declfuntail
     {
         try
         {
-            $$ = Cedomp::Semantic::CreateFunction($1, $2);
+            $$ = Cedomp::Semantic::CreateFunction($2, $4);
         }
         catch(Cedomp::Exceptions::CedompException& e)
         {
@@ -338,10 +377,24 @@ addtoscope declfuntail
 }
 ;
 
-addtoscope:
-T_DEF T_ID createscope T_LEFT_PAR arglist T_RIGHT_PAR T_COLON T_NL
+parseargcontext:
+%empty
 {
-    if($2 == nullptr || $5 == nullptr)
+    Cedomp::Semantic::ChangeContext(Cedomp::Semantic::PARSEARG);
+}
+;
+
+restorecontext:
+%empty
+{
+    Cedomp::Semantic::RestoreContext();
+}
+;
+
+addtoscope:
+T_DEF T_ID createscope T_LEFT_PAR parseargcontext arglist restorecontext T_RIGHT_PAR T_COLON T_NL
+{
+    if($2 == nullptr || $6 == nullptr)
     {
         $$ = nullptr;
     }
@@ -349,7 +402,7 @@ T_DEF T_ID createscope T_LEFT_PAR arglist T_RIGHT_PAR T_COLON T_NL
     {
         try
         {
-            $$ = Cedomp::Semantic::AddFunctionToScope($2, $5);
+            $$ = Cedomp::Semantic::AddFunctionToScope($2, $6);
         }
         catch(Cedomp::Exceptions::CedompException& e)
         {
@@ -361,11 +414,27 @@ T_DEF T_ID createscope T_LEFT_PAR arglist T_RIGHT_PAR T_COLON T_NL
 |
 T_DEF T_ID createscope T_LEFT_PAR T_RIGHT_PAR T_COLON T_NL
 {
+    if($2 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::AddFunctionToScope($2);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 ;
 
 arglist:
-arglist T_COMMA T_ID
+arglist T_COMMA expr
 {
     if($1 == nullptr || $3 == nullptr)
     {
@@ -385,7 +454,7 @@ arglist T_COMMA T_ID
     }
 }
 |
-T_ID
+expr
 {
     if($1 == nullptr)
     {
@@ -406,19 +475,44 @@ T_ID
 }
 ;
 
-declfuntail:
-funcbody destroyscope T_END
+funbodycontext:
+%empty
 {
+    Cedomp::Semantic::ChangeContext(Cedomp::Semantic::FUNCTION);
+}
+;
+
+declfuntail:
+funbodycontext funcbody restorecontext destroyscope T_END
+{
+    if($2 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::ParseFunctionBody($2);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 ;
 
 funcbody:
 statements
 {
+    $$ = $1;
 }
 |
 %empty
 {
+    $$ = new Cedomp::AST::BlockNode();
 }
 ;
 

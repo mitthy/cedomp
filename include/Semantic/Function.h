@@ -9,7 +9,8 @@
 #define FUNCTION_H_
 #include "AST/AST.h"
 #include <vector>
-
+#include "Type/Types.h"
+#include <algorithm>
 namespace Cedomp
 {
 	namespace Semantic
@@ -17,16 +18,23 @@ namespace Cedomp
 		struct FunctionInfo
 		{
 			std::string name;
-			std::vector<Cedomp::AST::VariableNode*>* args;
+			std::vector<Cedomp::AST::ExpressionNode*>* args;
 		};
 
 		AST::FunctionNode* CreateFunction( FunctionInfo* functionInfo,
-				AST::BlockNode* body );
+				AST::BlockNode* bodyInfo );
 
-		std::vector<std::string>* ParseArgList(
-				std::vector<std::string>*, char* id );
+		std::vector<AST::ExpressionNode*>* ParseArgList(
+				std::vector<AST::ExpressionNode*>*, AST::ExpressionNode* id );
 
-		FunctionInfo* AddFunctionToScope(char* name, std::vector<std::string>* args);
+		FunctionInfo* AddFunctionToScope( char* name,
+				std::vector<AST::ExpressionNode*>* args );
+
+		FunctionInfo* AddFunctionToScope( char* name );
+
+		AST::BlockNode* ParseFunctionBody( AST::BlockNode* body );
+
+		AST::ReturnNode* CheckReturnStatement( AST::ExpressionNode* expr );
 
 	}
 }

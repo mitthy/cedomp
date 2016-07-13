@@ -1,5 +1,6 @@
 extern int yyparse();
 #include "AST/AST.h"
+#include <iostream>
 extern Cedomp::AST::AbstractNode* root;
 extern FILE * yyin;
 int main( int argc, char** argv )

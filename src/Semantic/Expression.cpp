@@ -12,6 +12,7 @@
 #include "Type/Operations.h"
 #include "Exceptions/ExpressionExceptions.h"
 #include "Exceptions/TypeExceptions.h"
+#include "Semantic/Utility.h"
 
 using namespace Cedomp::AST;
 
@@ -37,6 +38,13 @@ ExpressionNode* Cedomp::Semantic::ComputeID( char * val )
 	std::string id(val);
 	auto& varScope = Cedomp::Scope::Scope::getScope();
 	auto& funScope = Cedomp::Scope::FunctionScope::getScope();
+	if (Cedomp::Semantic::getContext() == Cedomp::Semantic::Context::PARSEARG)
+	{
+		Cedomp::Scope::Scope::getScope().addToScope(id,
+				Type::BaseType::TYPEDYNAMIC);
+		VariableNode* ret = new VariableNode(id, Type::BaseType::TYPEDYNAMIC);
+		return ret;
+	}
 	if (funScope.searchScope(id))
 	{
 		VariableNode* ret = new VariableNode(id, Type::BaseType::TYPEFUNCTION);

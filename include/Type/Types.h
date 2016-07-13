@@ -34,7 +34,17 @@ namespace Cedomp
 		 */
 		enum BaseType
 		{
-			TYPEERROR, TYPEINT, TYPEFLOAT, TYPEBOOL, TYPEFUNCTION, TYPEMAP, TYPELIST, TYPESTRING, TYPEGENERIC, TEND
+			TYPEERROR,
+			TYPEINT,
+			TYPEFLOAT,
+			TYPEBOOL,
+			TYPEFUNCTION,
+			TYPEMAP,
+			TYPELIST,
+			TYPESTRING,
+			TYPEGENERIC,
+			TYPEDYNAMIC,
+			TEND
 		};
 
 		class Type
@@ -85,7 +95,7 @@ namespace Cedomp
 			static bool isCompatible( const TypeCode& typeCode1,
 					const TypeCode& typeCode2 );
 
-			static bool isBaseType (const TypeCode& typeCode );
+			static bool isBaseType( const TypeCode& typeCode );
 
 			static std::string getTypeName( const TypeCode& typeCode );
 
@@ -99,8 +109,6 @@ namespace Cedomp
 
 			//Last should always be initialized to TEND
 			static TypeCode last;
-
-
 
 		};
 

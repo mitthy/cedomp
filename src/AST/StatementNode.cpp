@@ -120,6 +120,18 @@ IfNode::IfNode( ExpressionNode* condition, BlockNode* thenBody,
 
 }
 
+void IfNode::searchReturnValue( std::vector<ExpressionNode*>& output ) const
+{
+	if (thenBody)
+	{
+		thenBody->searchReturnValue(output);
+	}
+	if (elseBody)
+	{
+		elseBody->searchReturnValue(output);
+	}
+}
+
 void IfNode::printNode() const
 {
 	std::cout << "if ";
@@ -144,11 +156,75 @@ WhileNode::WhileNode( ExpressionNode* condition, BlockNode* body ) :
 
 }
 
+void WhileNode::searchReturnValue( std::vector<ExpressionNode*>& output ) const
+{
+	if (body)
+	{
+		body->searchReturnValue(output);
+	}
+}
+
 void WhileNode::printNode() const
 {
 	std::cout << "while ";
 	condition->printNode();
 	std::cout << std::endl;
+	body->printNode();
+	std::cout << "end";
+}
+
+ReturnNode::ReturnNode( ExpressionNode* expr ) :
+		retValue(expr)
+{
+
+}
+
+void ReturnNode::searchReturnValue( std::vector<ExpressionNode*>& output ) const
+{
+	output.push_back(this->retValue.get());
+}
+
+void ReturnNode::printNode() const
+{
+	std::cout << "return ";
+	retValue->printNode();
+}
+
+FunctionNode::FunctionNode( std::string id,
+		std::vector<Cedomp::AST::ExpressionNode*>*args,
+		Cedomp::Type::TypeCode returnType, Cedomp::Type::TypeCode genericType,
+		BlockNode* body ) :
+		id(id), returnType(returnType), genericType(genericType), body(body)
+{
+	if (args)
+	{
+		for (auto& el : (*args))
+		{
+			std::shared_ptr<ExpressionNode> toAdd(el);
+			this->args.push_back(toAdd);
+		}
+		delete args;
+	}
+
+}
+
+void FunctionNode::printNode() const
+{
+	std::cout << "function " << id << ": {type:"
+			<< Cedomp::Type::Type::getTypeName(returnType);
+	if (genericType != Cedomp::Type::TYPEGENERIC
+			&& genericType != Cedomp::Type::TYPEDYNAMIC)
+	{
+		std::cout << ":" << Cedomp::Type::Type::getTypeName(genericType);
+	}
+	std::cout << "}" << std::endl;
+	std::cout << "args beg" << std::endl;
+	for (auto& arg : args)
+	{
+		arg->printNode();
+		std::cout << std::endl;
+	}
+	std::cout << "args end" << std::endl;
 	body->printNode();
 	std::cout << "end";
 }

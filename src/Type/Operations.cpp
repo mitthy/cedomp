@@ -50,6 +50,11 @@ void Operation::registerUnaryOperation( TypeCode type,
 bool Operation::getReturnBinaryType( TypeCode type1,
 		const std::string& operation, TypeCode type2, TypeCode& ret )
 {
+	if(type1 == BaseType::TYPEDYNAMIC || type2 == BaseType::TYPEDYNAMIC)
+	{
+		ret = BaseType::TYPEDYNAMIC;
+		return true;
+	}
 	if (this->binaryOpMap.find(type1) == binaryOpMap.end())
 	{
 		ret = BaseType::TYPEERROR;
@@ -74,6 +79,11 @@ bool Operation::getReturnBinaryType( TypeCode type1,
 bool Operation::getReturnUnaryType( TypeCode type, const std::string& operation,
 		TypeCode& ret )
 {
+	if(type == BaseType::TYPEDYNAMIC)
+	{
+		ret = BaseType::TYPEDYNAMIC;
+		return true;
+	}
 	if (this->unaryOpMap.find(type) == this->unaryOpMap.end())
 	{
 		ret = BaseType::TYPEERROR;

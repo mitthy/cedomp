@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace Cedomp
 {
@@ -31,7 +32,8 @@ namespace Cedomp
 		{
 			bool defined;
 			Type::TypeCode type;
-			std::vector<variableInfo> argInfo;
+			Type::TypeCode genericType;
+			std::vector<std::shared_ptr<AST::ExpressionNode>> argInfo;
 		};
 
 		class ScopeNode

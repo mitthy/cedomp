@@ -33,3 +33,17 @@ void SemanticErrorNode::printNode() const
 {
 	std::cout << "semantic error ocurred in this branch";
 }
+
+
+void AbstractNode::searchReturnValue(std::vector<ExpressionNode*>& output) const
+{
+	//Default implementation
+}
+
+void BlockNode::searchReturnValue(std::vector<ExpressionNode*>& output) const
+{
+	for(auto& node : nodes)
+	{
+		node->searchReturnValue(output);
+	}
+}

@@ -115,3 +115,4 @@ AbstractNode* Cedomp::Semantic::ParseFor( ExpressionNode* condition,
 	}
 	return new Cedomp::AST::WhileNode(condition, body);
 }
+

@@ -14,7 +14,6 @@
 #include "Scope/Scope.h"
 #include <vector>
 
-
 namespace Cedomp
 {
 	namespace AST
@@ -52,10 +51,13 @@ namespace Cedomp
 		class IfNode: public StatementNode
 		{
 		public:
-			IfNode(ExpressionNode* condition);
-			IfNode(ExpressionNode* condition, BlockNode* thenBody);
-			IfNode(ExpressionNode* condition, BlockNode* thenBody, BlockNode* elseBody);
+			IfNode( ExpressionNode* condition );
+			IfNode( ExpressionNode* condition, BlockNode* thenBody );
+			IfNode( ExpressionNode* condition, BlockNode* thenBody,
+					BlockNode* elseBody );
 			virtual void printNode() const;
+			virtual void searchReturnValue(
+					std::vector<ExpressionNode*>& output ) const;
 		private:
 			std::unique_ptr<ExpressionNode> condition;
 			std::unique_ptr<BlockNode> thenBody;
@@ -65,8 +67,10 @@ namespace Cedomp
 		class WhileNode: public StatementNode
 		{
 		public:
-			WhileNode(ExpressionNode* condition, BlockNode* body);
+			WhileNode( ExpressionNode* condition, BlockNode* body );
 			virtual void printNode() const;
+			virtual void searchReturnValue(
+					std::vector<ExpressionNode*>& output ) const;
 		private:
 			std::unique_ptr<ExpressionNode> condition;
 			std::unique_ptr<BlockNode> body;
@@ -75,7 +79,28 @@ namespace Cedomp
 		class FunctionNode: public StatementNode
 		{
 		public:
-			//TODO
+			FunctionNode( std::string id,
+					std::vector<Cedomp::AST::ExpressionNode*>* args,
+					Cedomp::Type::TypeCode returnType,
+					Cedomp::Type::TypeCode genericType, BlockNode* body );
+			virtual void printNode() const;
+		private:
+			std::string id;
+			std::vector<std::shared_ptr<Cedomp::AST::ExpressionNode>> args;
+			Cedomp::Type::TypeCode returnType;
+			Cedomp::Type::TypeCode genericType;
+			BlockNode* body;
+		};
+
+		class ReturnNode: public StatementNode
+		{
+		public:
+			ReturnNode( ExpressionNode* expr );
+			virtual void printNode() const;
+			virtual void searchReturnValue(
+					std::vector<ExpressionNode*>& output ) const;
+		private:
+			std::unique_ptr<ExpressionNode> retValue;
 		};
 
 	}

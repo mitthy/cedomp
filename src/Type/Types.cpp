@@ -24,6 +24,7 @@ std::set<std::string> createTypeSet()
 	ret.insert("list");
 	ret.insert("string");
 	ret.insert("generic");
+	ret.insert("dynamic");
 	return ret;
 }
 
@@ -43,6 +44,7 @@ std::map<TypeCode, std::string> createTypeMap()
 	ret[TYPELIST] = "list";
 	ret[TYPESTRING] = "string";
 	ret[TYPEGENERIC] = "generic";
+	ret[TYPEDYNAMIC] = "dynamic";
 	return ret;
 }
 
@@ -109,6 +111,10 @@ bool Type::isCompatible( const TypeCode& typeCode1, const TypeCode& typeCode2 )
 	if (typeCode1 == BaseType::TYPEERROR || typeCode2 == BaseType::TYPEERROR)
 	{
 		return false;
+	}
+	if(typeCode1 == BaseType::TYPEDYNAMIC || typeCode2 == BaseType::TYPEDYNAMIC)
+	{
+		return true;
 	}
 	if (typeCode1 == typeCode2)
 	{
