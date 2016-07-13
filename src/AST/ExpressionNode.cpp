@@ -405,3 +405,13 @@ void LenNode::printOpName() const
 	std::cout << "len";
 }
 
+FunctionExpressionNode::FunctionExpressionNode( std::string id ) :
+		ExpressionNode(Cedomp::Type::TYPEFUNCTION), id(id)
+{
+
+}
+void FunctionExpressionNode::printExpressionValue() const
+{
+	std::cout << "func id: " << id;
+}
+

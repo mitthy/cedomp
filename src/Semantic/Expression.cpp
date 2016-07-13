@@ -47,7 +47,7 @@ ExpressionNode* Cedomp::Semantic::ComputeID( char * val )
 	}
 	if (funScope.searchScope(id))
 	{
-		VariableNode* ret = new VariableNode(id, Type::BaseType::TYPEFUNCTION);
+		ExpressionNode* ret = new FunctionExpressionNode(id);
 		ret->setGenericTypeCode(funScope.searchScope(id)->type);
 		return ret;
 	}

@@ -303,6 +303,15 @@ namespace Cedomp
 			virtual void printOpName() const;
 		};
 
+		class FunctionExpressionNode: public ExpressionNode
+		{
+		public:
+			FunctionExpressionNode(std::string id);
+			virtual void printExpressionValue() const;
+		private:
+			std::string id;
+		};
+
 	}
 }
 #endif /* EXPRESSIONNODE_H_ */
