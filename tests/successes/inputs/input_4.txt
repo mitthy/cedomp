@@ -1,0 +1,36 @@
+#funcao recursiva
+def a():
+    return a()
+end
+
+b = a
+
+b()
+
+a()
+
+def c(charmander, charmeleon, charizard):
+    return charmander + charmeleon + charizard
+end
+
+c(1,2,3) + c(1,2,3)
+
+biir = c
+
+biir(1,2,3) + biir(1,2,3)
+
+def d(1):
+end
+
+d(1.1)
+
+def z():
+    def h():
+        return "retorno"
+    end
+    return h
+end
+
+biir(a,d,biir)
+
+

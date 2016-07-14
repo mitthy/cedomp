@@ -1,63 +1,28 @@
-assigning var {type:integer} int1 = {integer: 2}
-assigning var {type:integer} int2 = {integer: 5}
-assigning var {type:integer} int3 = {integer: 9}
-assigning var {type:float} float1 = {float: 0.2}
-assigning var {type:float} float2 = {float: 2}
-assigning var {type:float} float3 = {float: 4.5}
-assigning var {type:string} str3 = {string: Teste do str3}
-assigning var {type:string} str2 = {string: Ola mundo 
- estou 	 vivo}
-assigning var {type:string} str1 = {string: Teste da str1}
-assigning var {type:bool} bool1 = {bool: false}
-assigning var {type:bool} bool2 = {bool: true}
-assigning var {type:bool} bool3 = {bool: false}
-assigning var {type:bool} bool1 = {bool: var: bool2}
-assigning var {type:string} str1 = {string: var: str2}
-assigning var {type:integer} int1 = {integer: var: int2}
-assigning var {type:integer} int1 = (integer) {float: var: float1}
-assigning var {type:float} float3 = {float: var: float2}
-assigning var {type:float} float2 = (float) {integer: var: int2}
-assigning var {type:integer} var_int1 = {integer: {integer: 5} + {integer: {integer: 5} * {integer: 2}}}
-assigning var {type:integer} var_int2 = {integer: {integer: var: var_int1} - {integer: ({integer: {integer: 100}}) / {integer: 2}}}
-assigning var {type:integer} var_int3 = {integer: - ({integer: {integer: var: var_int2}})}
-{integer: {integer: var: var_int1} + {integer: 2}}
-assigning var {type:float} var_float1 = {float: {float: 30} - ({float: {float: {float: 10} + {float: 0.5}}})}
-assigning var {type:float} var_float2 = {float: - {float: var: var_float1}}
-assigning var {type:float} var_float3 = {float: {float: var: var_float2} + {float: var: var_float1}}
-assigning var {type:float} var_float1 = (float) {integer: {integer: 5} + (integer) {float: {float: 5} * (float) {integer: 3}}}
-assigning var {type:float} var_float2 = (float) {integer: {integer: var: var_int1} - {integer: ({integer: {integer: 100}}) * (integer) {float: 2.5}}}
-assigning var {type:float} var_float3 = (float) {integer: - ({integer: {integer: var: var_int2}})}
-assigning var {type:bool} var_bool2 = {bool: true}
-assigning var {type:bool} var_bool1 = {bool: {bool: false} and {bool: var: var_bool2}}
-assigning var {type:bool} var_bool1 = {bool: {bool: false} or ({bool: {bool: not ({bool: {bool: var: var_bool2}})}})}
-assigning var {type:bool} var_bool3 = {bool: {bool: var: var_bool1} and {bool: var: var_bool2}}
-{bool: {bool: var: var_bool3} or {bool: false}}
-{bool: {bool: var: var_bool1} xor {bool: var: var_bool3}}
-assigning var {type:string} str1 = {string: aaa}
-assigning var {type:string} str2 = {string: aaa}
-assigning var {type:string} str3 = {string: aaaa}
-assigning var {type:string} str4 = {string: aaa}
-assigning var {type:bool} var_bool1 = {bool: {bool: true} and {bool: {integer: var: var_int1} == {integer: var: var_int2}}}
-assigning var {type:bool} var_bool1 = {bool: {float: var: var_float1} >= (float) {integer: var: var_int2}}
-assigning var {type:bool} var_bool1 = {bool: {bool: {float: var: var_float1} == {float: var: var_float2}} or {bool: true}}
-assigning var {type:bool} var_bool1 = {bool: not ({bool: {bool: {float: var: var_float1} > (float) {integer: 4}}})}
-assigning var {type:bool} var_bool1 = {bool: {string: var: str1} == {string: var: str2}}
-assigning var {type:bool} var_bool1 = {bool: {string: var: str1} != {string: var: str2}}
-assigning var {type:bool} var_bool1 = {bool: {string: var: str1} == {string: var: str3}}
-assigning var {type:bool} var_bool1 = {bool: {string: var: str1} == {string: var: str4}}
-assigning var {type:list:integer} list1 = {list: new list}
-assigning var {type:list:integer} list2 = {list: new list}
-assigning var {type:list:integer} list3 = {list: new list}
-assigning var {type:list:bool} listB1 = {list: new list}
-assigning var {type:list:integer} list1[{integer: 0}] = {integer: 3}
-assigning var {type:list:integer} list1[{integer: 1}] = (integer) {float: 5.2}
-assigning var {type:list:integer} list1[{integer: 1}] = {integer: {list1[{integer: 0}]}}
-assigning var {type:list:integer} list2[{integer: 0}] = {integer: {list1[{integer: 1}]}}
-assigning var {type:list:integer} list3[{integer: 0}] = {integer: {integer: {list1[{integer: 1}]}} + {integer: {list2[{integer: 0}]}}}
-assigning var {type:list:bool} listB1[{integer: 0}] = {bool: {integer: {list1[{integer: 1}]}} == {integer: {list2[{integer: 0}]}}}
-assigning var {type:list:integer} list1[{integer: 0}] = {integer: 1}
-assigning var {type:list:integer} list1[{integer: 1}] = {integer: 2}
-assigning var {type:list:integer} list1[{integer: 0}] = (integer) {float: {float: 1.1} + (float) {integer: 3}}
-assigning var {type:list:integer} list2[{integer: 0}] = (integer) {float: 3.5}
-assigning var {type:list:integer} list2[{integer: 1}] = (integer) {float: 3.3}
-assigning var {type:list:integer} list2[{integer: 1}] = {integer: {integer: 2} + (integer) {float: 2.5}}
+assigning var {type:integer} a = {integer: 1}
+assigning var {type:integer} b = {integer: 4}
+while {bool: true}
+assigning var {type:string} a = {string: str}
+{integer: var: b}
+if {bool: true}
+then
+{string: var: a}
+{integer: var: b}
+end
+end
+assigning var {type:integer} i = {integer: 0}
+assigning var {type:string} c = {string: minhastring}
+assigning var {type:string} d = {string: }
+while {bool: {integer: var: i} < {integer: {integer: len {string: var: c}} - {integer: 6}}}
+assigning var {type:string} d = {string: {string: var: d} + {string: {c[{integer: var: i}]}}}
+end
+while {bool: true}
+while {bool: true}
+if {bool: true}
+then
+assigning var {type:string} minhastr = {string: Me da nota laercio plox plox}
+end
+end
+end
+while {bool: {float: 3.3} > (float) {integer: 0}}
+assigning var {type:integer} sentidodavida = {integer: 42}
+end

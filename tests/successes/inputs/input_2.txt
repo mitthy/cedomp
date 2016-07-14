@@ -1,39 +1,32 @@
-# Testes voltados pra o map
+a = 1
+if true:
+    a
+    #Cria nova variável a dentro do escopo do if
+    a = "str"
+    a + " concatena"
+    len a
+else:
+    #Deve ser um integer e não do tipo string, pois o escopo é diferente.
+    a
+    a = true
+    #Adiciona variável a no escopo do else.
+    a
+end
+d = 2.0
+#if alinhado. Tipo inteiro pode ser convertido para booleano.
+if 3 + 4:
+    c = "deve ser visivel dentro do else"
+    d = true
+    if 3 < 5 + 28:
+        #Deve ser um inteiro
+        a
+        b = list()
+        b = b + a
+    else:
+        c
+        #deve ser booleano
+        d
+    end
+end
 
-map1 = map()
-map2 = map()
-map3 = map()
 
-map1["kk"] = 3
-i = "string"
-map1[i] = 4
-map1['0'] = 5
-
-map1["kk"] = map1[i]
-map1["kk"] != map1[i]
-
-
-# Testes voltados a lista
-
-list1 = list()
-list2 = list()
-list3 = list()
-listB1 = list()
-
-list1[0] = 3
-list1[1] = 5.2
-
-list1[1] = list1[0]
-list2[0] = list1[1]
-
-list3[0] = list1[1] + list2[0]
-listB1[0] = list1[1] == list2[0]
-
-
-
-list1[0] = 1
-list1[1] = 2
-list1[0] = 1.1 + 3
-list2[0] = 3.5
-list2[1] = 3.3
-list2[1] = 2 + 2.5

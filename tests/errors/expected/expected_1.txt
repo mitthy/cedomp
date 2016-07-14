@@ -1,0 +1,22 @@
+[Line 2] Error: Computing expression: variable a was not declared.
+[Line 4] Error: Indexing var a: type integer can't be indexed with integer
+[Line 5] Error: Incompatible type: integer map
+[Line 7] Error: Can't get value from container b because it was not initialized
+[Line 9] Error: Incompatible type: bool float
+[Line 10] Error: Indexing var b: type map can't be indexed with integer
+[Line 12] Error: Can't get value from container c because it was not initialized
+[Line 14] Error: Indexing var c: type list can't be indexed with string
+[Line 16] Error: Operation integer + bool not supported
+[Line 17] Error: Operation integer + map not supported
+[Line 18] Error: Operation integer + list not supported
+[Line 19] Error: Operation integer + string not supported
+[Line 20] Error: Operation float - bool not supported
+[Line 21] Error: Operation integer and integer not supported
+[Line 22] Error: Operation integer xor integer not supported
+[Line 27] Error: Incompatible type: integer bool
+[Line 28] Error: Operation bool and float not supported
+[Line 28] Error: Operation len bool not supported
+[Line 29] Error: Operation len integer not supported
+[Line 31] Error: return declared outside of a function
+[Line 33] Error: Assigning 3 expressions to 2 variables
+[Line 34] Error: Assigning 1 expressions to 2 variables

@@ -373,7 +373,13 @@ ExpressionNode* Cedomp::Semantic::CheckParameters( char* id,
 					{
 						coercionGenericType = argNode->getGenericTypeCode();
 					}
-					paramNode->setCoercion(coercionType, coercionGenericType);
+					if (coercionType != Cedomp::Type::BaseType::TYPEDYNAMIC
+							&& coercionGenericType
+									!= Cedomp::Type::BaseType::TYPEDYNAMIC)
+					{
+						paramNode->setCoercion(coercionType,
+								coercionGenericType);
+					}
 				}
 			}
 			else

@@ -36,3 +36,84 @@ float2= int2
 
 list1 = list2
 
+
+2 + 2.2
+
+true xor false
+
+len "abacate"
+
+len list1
+
+"abacate" + " mamao"
+
+str1[0]
+
+str1 == str2
+
+str1 > str2
+
+str1 >= str2
+
+str1 <= str2
+
+str1 != str2
+
+str1 < str2
+
+2 + 2
+
+2 - 2
+
+2 * 2
+
+2 mod 2
+
+2 == 2
+
+2 >= 2
+
+2 <= 2
+
+2 != 2
+
+2 < 2
+
+2 > 2
+
+f1 = 1.1
+f2 = 1.1
+
+f1 + f2
+f1 - f2
+f1 * f2
+f1/f2
+f1 == f2
+f1!=f2
+f1 > f2
+f1 >= f2
+f1 <= f2
+f1 < f2
+1 mod f1
+not true
+true and false
+true or false
+true xor false
+true == false
+true != false
+map1 - "a"
+-1
+"a" + 1
+true and 1
+2.2 + 2
+2 + 2.2
+listcharmander = list()
+listbulbassauro = list()
+listcharmander = listcharmander + 3
+listbulbassauro = listbulbassauro + 3.3
+listbulbassauro = listcharmander
+
+apodi, cacarato = 1, 2 
+
+
+

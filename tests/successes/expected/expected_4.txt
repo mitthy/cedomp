@@ -1,0 +1,37 @@
+function a: {type:dynamic}
+args beg
+args end
+return {dynamic:dynamic: a()}
+end
+assigning var {type:function} b = {function:dynamic: func id: a}
+{dynamic:dynamic: a()}
+{dynamic:dynamic: a()}
+function c: {type:dynamic}
+args beg
+{dynamic: var: charmander}
+{dynamic: var: charmeleon}
+{dynamic: var: charizard}
+args end
+return {dynamic: {dynamic: {dynamic: var: charmander} + {dynamic: var: charmeleon}} + {dynamic: var: charizard}}
+end
+{dynamic: {dynamic:dynamic: c({integer: 1}{integer: 2}{integer: 3})} + {dynamic:dynamic: c({integer: 1}{integer: 2}{integer: 3})}}
+assigning var {type:function} biir = {function:dynamic: func id: c}
+{dynamic: {dynamic:dynamic: c({integer: 1}{integer: 2}{integer: 3})} + {dynamic:dynamic: c({integer: 1}{integer: 2}{integer: 3})}}
+function d: {type:dynamic}
+args beg
+{integer: 1}
+args end
+return {integer: 0}
+end
+{dynamic:dynamic: d((integer) {float: 1.1})}
+function z: {type:dynamic}
+args beg
+args end
+function h: {type:dynamic}
+args beg
+args end
+return {string: retorno}
+end
+return {function:dynamic: func id: h}
+end
+{dynamic:dynamic: c({function:dynamic: func id: a}{function:dynamic: func id: d}{function: var: biir})}

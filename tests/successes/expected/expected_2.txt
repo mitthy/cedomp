@@ -1,25 +1,27 @@
-assigning var {type:map:integer} map1 = {map: new map}
-assigning var {type:map} map2 = {map: new map}
-assigning var {type:map} map3 = {map: new map}
-assigning var {type:map:integer} map1[{string: kk}] = {integer: 3}
-assigning var {type:string} i = {string: string}
-assigning var {type:map:integer} map1[{string: var: i}] = {integer: 4}
-assigning var {type:map:integer} map1[{string: 0}] = {integer: 5}
-assigning var {type:map:integer} map1[{string: kk}] = {integer: {map1[{string: var: i}]}}
-{bool: {integer: {map1[{string: kk}]}} != {integer: {map1[{string: var: i}]}}}
-assigning var {type:list:integer} list1 = {list: new list}
-assigning var {type:list:integer} list2 = {list: new list}
-assigning var {type:list:integer} list3 = {list: new list}
-assigning var {type:list:bool} listB1 = {list: new list}
-assigning var {type:list:integer} list1[{integer: 0}] = {integer: 3}
-assigning var {type:list:integer} list1[{integer: 1}] = (integer) {float: 5.2}
-assigning var {type:list:integer} list1[{integer: 1}] = {integer: {list1[{integer: 0}]}}
-assigning var {type:list:integer} list2[{integer: 0}] = {integer: {list1[{integer: 1}]}}
-assigning var {type:list:integer} list3[{integer: 0}] = {integer: {integer: {list1[{integer: 1}]}} + {integer: {list2[{integer: 0}]}}}
-assigning var {type:list:bool} listB1[{integer: 0}] = {bool: {integer: {list1[{integer: 1}]}} == {integer: {list2[{integer: 0}]}}}
-assigning var {type:list:integer} list1[{integer: 0}] = {integer: 1}
-assigning var {type:list:integer} list1[{integer: 1}] = {integer: 2}
-assigning var {type:list:integer} list1[{integer: 0}] = (integer) {float: {float: 1.1} + (float) {integer: 3}}
-assigning var {type:list:integer} list2[{integer: 0}] = (integer) {float: 3.5}
-assigning var {type:list:integer} list2[{integer: 1}] = (integer) {float: 3.3}
-assigning var {type:list:integer} list2[{integer: 1}] = {integer: {integer: 2} + (integer) {float: 2.5}}
+assigning var {type:integer} a = {integer: 1}
+if {bool: true}
+then
+{integer: var: a}
+assigning var {type:string} a = {string: str}
+{string: {string: var: a} + {string:  concatena}}
+{integer: len {string: var: a}}
+else
+{integer: var: a}
+assigning var {type:bool} a = {bool: true}
+{bool: var: a}
+end
+assigning var {type:float} d = {float: 2}
+if (bool) {integer: {integer: 3} + {integer: 4}}
+then
+assigning var {type:string} c = {string: deve ser visivel dentro do else}
+assigning var {type:bool} d = {bool: true}
+if {bool: {integer: 3} < {integer: {integer: 5} + {integer: 28}}}
+then
+{integer: var: a}
+assigning var {type:list:integer} b = {list: new list}
+assigning var {type:list:integer} b = {list:integer: {list: var: b} + {integer: var: a}}
+else
+{string: var: c}
+{bool: var: d}
+end
+end

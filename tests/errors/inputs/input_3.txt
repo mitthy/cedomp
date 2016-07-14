@@ -1,0 +1,19 @@
+while map():
+    a = 3
+end
+
+while:
+    a
+end
+
+while len "kkk":
+    return 1
+end
+
+
+while:
+    a = 3
+end
+a
+
+

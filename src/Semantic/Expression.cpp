@@ -219,7 +219,7 @@ void computeBinary( std::string opName, ExpressionNode* left,
 	}
 	else
 	{
-		if (left->getGenericTypeCode() != Cedomp::Type::TYPEGENERIC)
+		if (left->getGenericTypeCode() != Cedomp::Type::TYPEGENERIC && checker == Cedomp::Type::TYPEGENERIC)
 		{
 			if (!Cedomp::Type::Type::isCompatible(left->getGenericTypeCode(),
 					right->getGenericTypeCode()))

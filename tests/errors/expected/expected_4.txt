@@ -1,0 +1,10 @@
+[Line 3] Error: can't declare function inside if or while context
+[Line 9] Error: wrong number of parameters: expected 0 was given 1
+[Line 14] Error: wrong number of parameters: expected 2 was given 3
+[Line 19] Error: Incompatible type: integer bool
+[Line 21] Error: Using function charmander as variable
+[Line 26] Error: can't declare a as a function: was already a variable
+[Line 30] Error: can't declare function inside if or while context
+[Line 35] Error: Incompatible type: integer bool
+[Line 37] Error: wrong number of parameters: expected 1 was given 2
+[Line 39] Error: wrong number of parameters: expected 1 was given 0

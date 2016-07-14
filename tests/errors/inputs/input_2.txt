@@ -1,0 +1,25 @@
+if 2.2:
+    c = 1
+end
+if map():
+    c = 1
+end
+
+if "str":
+    c = 1
+end
+
+if true:
+    a = "sorvete"
+end
+a
+
+if true:
+    b = "dsapldpsa"
+else:
+    b
+end
+
+if true:
+    return 1
+end

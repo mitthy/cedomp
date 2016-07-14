@@ -1,0 +1,6 @@
+[Line 3] Error: Incompatible type: float bool
+[Line 6] Error: Incompatible type: map bool
+[Line 10] Error: Incompatible type: string bool
+[Line 16] Error: Computing expression: variable a was not declared.
+[Line 21] Error: Computing expression: variable b was not declared.
+[Line 25] Error: return declared outside of a function

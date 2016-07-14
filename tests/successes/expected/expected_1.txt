@@ -24,3 +24,57 @@ assigning var {type:integer} int1 = (integer) {float: var: float1}
 assigning var {type:float} float3 = {float: var: float2}
 assigning var {type:float} float2 = (float) {integer: var: int2}
 assigning var {type:list:string} list1 = {list:string: var: list2}
+{integer: {integer: 2} + (integer) {float: 2.2}}
+{bool: {bool: true} xor {bool: false}}
+{integer: len {string: abacate}}
+{integer: len {list:string: var: list1}}
+{string: {string: abacate} + {string:  mamao}}
+{string: {str1[{integer: 0}]}}
+{bool: {string: var: str1} == {string: var: str2}}
+{bool: {string: var: str1} > {string: var: str2}}
+{bool: {string: var: str1} >= {string: var: str2}}
+{bool: {string: var: str1} <= {string: var: str2}}
+{bool: {string: var: str1} != {string: var: str2}}
+{bool: {string: var: str1} < {string: var: str2}}
+{integer: {integer: 2} + {integer: 2}}
+{integer: {integer: 2} - {integer: 2}}
+{integer: {integer: 2} * {integer: 2}}
+{integer: {integer: 2} mod {integer: 2}}
+{bool: {integer: 2} == {integer: 2}}
+{bool: {integer: 2} >= {integer: 2}}
+{bool: {integer: 2} <= {integer: 2}}
+{bool: {integer: 2} != {integer: 2}}
+{bool: {integer: 2} < {integer: 2}}
+{bool: {integer: 2} > {integer: 2}}
+assigning var {type:float} f1 = {float: 1.1}
+assigning var {type:float} f2 = {float: 1.1}
+{float: {float: var: f1} + {float: var: f2}}
+{float: {float: var: f1} - {float: var: f2}}
+{float: {float: var: f1} * {float: var: f2}}
+{float: {float: var: f1} / {float: var: f2}}
+{bool: {float: var: f1} == {float: var: f2}}
+{bool: {float: var: f1} != {float: var: f2}}
+{bool: {float: var: f1} > {float: var: f2}}
+{bool: {float: var: f1} >= {float: var: f2}}
+{bool: {float: var: f1} <= {float: var: f2}}
+{bool: {float: var: f1} < {float: var: f2}}
+{integer: {integer: 1} mod (integer) {float: var: f1}}
+{bool: not {bool: true}}
+{bool: {bool: true} and {bool: false}}
+{bool: {bool: true} or {bool: false}}
+{bool: {bool: true} xor {bool: false}}
+{bool: {bool: true} == {bool: false}}
+{bool: {bool: true} != {bool: false}}
+{map: {map:integer: var: map1} - {string: a}}
+{integer: - {integer: 1}}
+{string: {string: a} + (string) {integer: 1}}
+{bool: {bool: true} and (bool) {integer: 1}}
+{float: {float: 2.2} + (float) {integer: 2}}
+{integer: {integer: 2} + (integer) {float: 2.2}}
+assigning var {type:list:integer} listcharmander = {list: new list}
+assigning var {type:list:float} listbulbassauro = {list: new list}
+assigning var {type:list:integer} listcharmander = {list:integer: {list: var: listcharmander} + {integer: 3}}
+assigning var {type:list:float} listbulbassauro = {list:float: {list: var: listbulbassauro} + {float: 3.3}}
+assigning var {type:list:float} listbulbassauro = (list:float) {list:integer: var: listcharmander}
+assigning var {type:integer} apodi = {integer: 1}
+assigning var {type:integer} cacarato = {integer: 2}

@@ -1,0 +1,40 @@
+if true:
+    def fun():
+    end
+end
+
+def zuera():
+end
+
+zuera(1)
+
+def charmander(a,b):
+end
+
+charmander(1,2,3)
+
+def charmeleon(1):
+end
+
+charmeleon(false)
+
+charmander = 3
+
+a = "kkkk"
+
+def a():
+end
+
+while:
+    def funcao():
+    end
+end
+
+ptrfunct = charmeleon
+
+ptrfunct(false)
+
+ptrfunct(1,2)
+
+ptrfunct()
+

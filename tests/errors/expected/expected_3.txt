@@ -1,0 +1,4 @@
+[Line 3] Error: Incompatible type: map bool
+[Line 7] Error: Computing expression: variable a was not declared.
+[Line 11] Error: return declared outside of a function
+[Line 18] Error: Computing expression: variable a was not declared.
