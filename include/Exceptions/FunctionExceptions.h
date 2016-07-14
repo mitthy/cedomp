@@ -60,6 +60,17 @@ namespace Cedomp
 		private:
 			std::string id;
 		};
+
+		class WrongNumberOfArguments: public FunctionException
+		{
+		public:
+			WrongNumberOfArguments( int expected, int actual );
+		protected:
+			virtual std::string Error();
+		private:
+			int actual;
+			int expected;
+		};
 	}
 }
 

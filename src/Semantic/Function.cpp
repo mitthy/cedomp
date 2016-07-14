@@ -13,6 +13,10 @@
 #include <set>
 #include "Exceptions/FunctionExceptions.h"
 #include <algorithm>
+#include "Scope/Scope.h"
+#include "Exceptions/ExpressionExceptions.h"
+#include "Type/Operations.h"
+#include "Exceptions/TypeExceptions.h"
 using namespace Cedomp::AST;
 using Cedomp::Semantic::FunctionInfo;
 
@@ -57,85 +61,8 @@ FunctionNode* Cedomp::Semantic::CreateFunction( FunctionInfo* functionInfo,
 			functionSymbol->argInfo.push_back(toAdd);
 		}
 	}
-	std::vector<ExpressionNode*> returnValues;
-	bodyInfo->searchReturnValue(returnValues);
-	bool searchForReturnType = true;
-	for (auto& node : returnValues)
-	{
-		if (node->getTypeCode() == Cedomp::Type::TYPEDYNAMIC)
-		{
-			searchForReturnType = false;
-			functionSymbol->type = Cedomp::Type::TYPEDYNAMIC;
-			functionSymbol->genericType = Cedomp::Type::TYPEDYNAMIC;
-		}
-	}
-	if (searchForReturnType)
-	{
-		ReturnType retType;
-		retType.returnType = Cedomp::Type::TYPEDYNAMIC;
-		retType.genericType = Cedomp::Type::TYPEDYNAMIC;
-		//Now we should figure out a uniform return type for the function
-		std::set<ReturnType> returnTypeCodes;
-
-		for (auto& node : returnValues)
-		{
-			auto nodeTypeCode = node->getTypeCode();
-			auto nodeGenericTypeCode = node->getGenericTypeCode();
-			ReturnType value;
-			value.genericType = nodeGenericTypeCode;
-			value.returnType = nodeTypeCode;
-			returnTypeCodes.insert(value);
-		}
-		std::set<ReturnType> candidateTypes;
-		for (auto element : returnTypeCodes)
-		{
-			bool candidate = true;
-			for (auto elementToCompare : returnTypeCodes)
-			{
-
-				if (!Cedomp::Type::Type::isCompatible(element.returnType,
-						elementToCompare.returnType)
-						|| !Cedomp::Type::Type::isCompatible(
-								element.genericType,
-								elementToCompare.genericType))
-				{
-					candidate = false;
-					break;
-				}
-			}
-			if (candidate)
-			{
-				candidateTypes.insert(element);
-			}
-		}
-		if (candidateTypes.empty())
-		{
-			functionSymbol->type = Cedomp::Type::TYPEDYNAMIC;
-			functionSymbol->genericType = Cedomp::Type::TYPEDYNAMIC;
-		}
-		else if (candidateTypes.size() > 1)
-		{
-			for (auto& node : returnValues)
-			{
-				ReturnType checker;
-				checker.returnType = node->getTypeCode();
-				checker.genericType = node->getGenericTypeCode();
-				if (candidateTypes.find(checker) != candidateTypes.end())
-				{
-					functionSymbol->type = checker.returnType;
-					functionSymbol->genericType = checker.genericType;
-					break;
-				}
-			}
-		}
-		else
-		{
-			auto val = (*candidateTypes.begin());
-			functionSymbol->genericType = val.genericType;
-			functionSymbol->type = val.returnType;
-		}
-
-	}
+	functionSymbol->type = Cedomp::Type::TYPEDYNAMIC;
+	functionSymbol->genericType = Cedomp::Type::TYPEDYNAMIC;
 	return new FunctionNode(functionInfo->name, functionInfo->args,
 			functionSymbol->type, functionSymbol->genericType, bodyInfo);
 }
@@ -224,4 +151,251 @@ ReturnNode* Cedomp::Semantic::CheckReturnStatement( ExpressionNode* expr )
 		throw Cedomp::Exceptions::ReturnOutsideFunction();
 	}
 	return new ReturnNode(expr);
+}
+
+std::vector<ExpressionNode*>* Cedomp::Semantic::PassParameters(
+		std::vector<ExpressionNode*>* list, ExpressionNode* next )
+{
+	std::vector<ExpressionNode*>* ret = list;
+	if (ret == nullptr)
+	{
+		ret = new std::vector<ExpressionNode*>();
+	}
+	ret->push_back(next);
+	return ret;
+}
+
+ExpressionNode* Cedomp::Semantic::CheckParameters( char* id )
+{
+	std::string funcName(id);
+	auto val = Cedomp::Scope::FunctionScope::getScope().searchScope(funcName);
+	if (val)
+	{
+		if (val->argInfo.size())
+		{
+			throw Cedomp::Exceptions::WrongNumberOfArguments(
+					val->argInfo.size(), 0);
+		}
+		ExpressionNode* ret = new FunctionCallNode(val->name, val->type);
+		ret->setGenericTypeCode(Cedomp::Type::TYPEDYNAMIC);
+		return ret;
+
+	}
+	else
+	{
+		auto varNode = Cedomp::Scope::Scope::getScope().searchScope(funcName);
+		if (!varNode)
+		{
+			throw Cedomp::Exceptions::VariableNotDeclaredException(funcName);
+		}
+		Cedomp::Type::TypeCode checker;
+		if (!Cedomp::Type::Operation::getInstance().getReturnUnaryType(
+				varNode->type, "()", checker))
+		{
+			throw Cedomp::Exceptions::UnaryOperationNotSupported("()",
+					varNode->type);
+		}
+		val = varNode->pointerToFunc;
+		if (!val)
+		{
+			std::cerr << "BUG" << std::endl;
+			std::exit(-1);
+		}
+		if (val->argInfo.size())
+		{
+			throw Cedomp::Exceptions::WrongNumberOfArguments(
+					val->argInfo.size(), 0);
+		}
+		ExpressionNode* ret = new FunctionCallNode(val->name, val->type);
+		ret->setGenericTypeCode(Cedomp::Type::TYPEDYNAMIC);
+		return ret;
+	}
+
+}
+
+ExpressionNode* Cedomp::Semantic::CheckParameters( char* id,
+		std::vector<ExpressionNode*>* params )
+{
+
+	std::string funcName(id);
+	auto val = Cedomp::Scope::FunctionScope::getScope().searchScope(funcName);
+	if (val)
+	{
+		if (val->argInfo.size() != params->size())
+		{
+			int sz = params->size();
+			for (auto val : (*params))
+			{
+				delete val;
+			}
+			delete params;
+			throw Cedomp::Exceptions::WrongNumberOfArguments(
+					val->argInfo.size(), sz);
+		}
+		auto argBeg = val->argInfo.begin();
+		auto argEnd = val->argInfo.end();
+		auto paramBeg = params->begin();
+		auto paramEnd = params->end();
+		Cedomp::Type::TypeCode type1;
+		Cedomp::Type::TypeCode type2;
+		bool throwExcp = false;
+		for (; argBeg != argEnd || paramBeg != paramEnd; ++argBeg, ++paramBeg)
+		{
+			auto argNode = (*argBeg);
+			auto paramNode = (*paramBeg);
+
+			if (Cedomp::Type::Type::isCompatible(argNode->getTypeCode(),
+					paramNode->getTypeCode()))
+			{
+				if (!Cedomp::Type::Type::isCompatible(
+						argNode->getGenericTypeCode(),
+						paramNode->getGenericTypeCode()))
+				{
+					type1 = argNode->getGenericTypeCode();
+					type2 = paramNode->getGenericTypeCode();
+					throwExcp = true;
+					break;
+				}
+				else
+				{
+					Cedomp::Type::TypeCode coercionType =
+							Cedomp::Type::TYPEGENERIC;
+					Cedomp::Type::TypeCode coercionGenericType =
+							Cedomp::Type::TYPEGENERIC;
+					if (argNode->getTypeCode() != paramNode->getTypeCode())
+					{
+						coercionType = argNode->getTypeCode();
+					}
+					if (argNode->getGenericTypeCode()
+							!= paramNode->getGenericTypeCode())
+					{
+						coercionGenericType = argNode->getGenericTypeCode();
+					}
+					if (coercionType != Cedomp::Type::BaseType::TYPEDYNAMIC
+							&& coercionGenericType
+									!= Cedomp::Type::BaseType::TYPEDYNAMIC)
+					{
+						paramNode->setCoercion(coercionType,
+								coercionGenericType);
+					}
+
+				}
+			}
+			else
+			{
+				type1 = argNode->getTypeCode();
+				type2 = paramNode->getTypeCode();
+				throwExcp = true;
+				break;
+			}
+		}
+		if (throwExcp)
+		{
+			for (auto val : (*params))
+			{
+				delete val;
+			}
+			delete params;
+			throw Cedomp::Exceptions::IncompatibleTypeException(type1, type2);
+		}
+		ExpressionNode* ret = new FunctionCallNode(val->name, val->type,
+				params);
+		ret->setGenericTypeCode(Cedomp::Type::TYPEDYNAMIC);
+		return ret;
+
+	}
+	else
+	{
+		auto varNode = Cedomp::Scope::Scope::getScope().searchScope(funcName);
+		if (!varNode)
+		{
+			throw Cedomp::Exceptions::VariableNotDeclaredException(funcName);
+		}
+		Cedomp::Type::TypeCode checker;
+		if (!Cedomp::Type::Operation::getInstance().getReturnUnaryType(
+				varNode->type, "()", checker))
+		{
+			throw Cedomp::Exceptions::UnaryOperationNotSupported("()",
+					varNode->type);
+		}
+		val = varNode->pointerToFunc;
+		if (!val)
+		{
+			std::cerr << "BUG" << std::endl;
+			std::exit(-1);
+		}
+		if (val->argInfo.size() != params->size())
+		{
+			int sz = params->size();
+			for (auto val : (*params))
+			{
+				delete val;
+			}
+			delete params;
+			throw Cedomp::Exceptions::WrongNumberOfArguments(
+					val->argInfo.size(), sz);
+		}
+		auto argBeg = val->argInfo.begin();
+		auto argEnd = val->argInfo.end();
+		auto paramBeg = params->begin();
+		auto paramEnd = params->end();
+		Cedomp::Type::TypeCode type1;
+		Cedomp::Type::TypeCode type2;
+		bool throwExcp = false;
+		for (; argBeg != argEnd || paramBeg != paramEnd; ++argBeg, ++paramBeg)
+		{
+			auto argNode = (*argBeg);
+			auto paramNode = (*paramBeg);
+			if (Cedomp::Type::Type::isCompatible(argNode->getTypeCode(),
+					paramNode->getTypeCode()))
+			{
+				if (!Cedomp::Type::Type::isCompatible(
+						argNode->getGenericTypeCode(),
+						paramNode->getGenericTypeCode()))
+				{
+					type1 = argNode->getGenericTypeCode();
+					type2 = paramNode->getGenericTypeCode();
+					throwExcp = true;
+					break;
+				}
+				else
+				{
+					Cedomp::Type::TypeCode coercionType =
+							Cedomp::Type::TYPEGENERIC;
+					Cedomp::Type::TypeCode coercionGenericType =
+							Cedomp::Type::TYPEGENERIC;
+					if (argNode->getTypeCode() != paramNode->getTypeCode())
+					{
+						coercionType = argNode->getTypeCode();
+					}
+					if (argNode->getGenericTypeCode()
+							!= paramNode->getGenericTypeCode())
+					{
+						coercionGenericType = argNode->getGenericTypeCode();
+					}
+					paramNode->setCoercion(coercionType, coercionGenericType);
+				}
+			}
+			else
+			{
+				type1 = argNode->getTypeCode();
+				type2 = paramNode->getTypeCode();
+				throwExcp = true;
+				break;
+			}
+		}
+		if (throwExcp)
+		{
+			for (auto val : (*params))
+			{
+				delete val;
+			}
+			delete params;
+			throw Cedomp::Exceptions::IncompatibleTypeException(type1, type2);
+		}
+		ExpressionNode* ret = new FunctionCallNode(val->name, val->type,
+				params);
+		ret->setGenericTypeCode(Cedomp::Type::TYPEDYNAMIC);
+		return ret;
+	}
 }

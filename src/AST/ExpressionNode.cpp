@@ -35,6 +35,15 @@ void ExpressionNode::printNode() const
 	std::cout << "}";
 }
 
+std::string ExpressionNode::getName()
+{
+	return name;
+}
+void ExpressionNode::setName( const std::string& name )
+{
+	this->name = name;
+}
+
 Cedomp::Type::TypeCode ExpressionNode::getCoercionTypeCode() const
 {
 	return coercionType;
@@ -54,8 +63,14 @@ ExpressionNode::ExpressionNode( Type::TypeCode type ) :
 void ExpressionNode::setCoercion( Type::TypeCode type,
 		Type::TypeCode genericType )
 {
-	coercionType = type;
-	coercionGenericType = genericType;
+	if(this->type != Type::TYPEDYNAMIC)
+	{
+		coercionType = type;
+	}
+	if(this->genericTypeCode != Type::TYPEDYNAMIC)
+	{
+		coercionGenericType = genericType;
+	}
 }
 
 Cedomp::Type::TypeCode ExpressionNode::getTypeCode() const
@@ -74,14 +89,14 @@ void ExpressionNode::setGenericTypeCode( Cedomp::Type::TypeCode generic )
 }
 
 VariableNode::VariableNode( std::string name, Type::TypeCode type ) :
-		ExpressionNode(type), varName(name)
+		ExpressionNode(type)
 {
-
+	setName(name);
 }
 
 void VariableNode::printExpressionValue() const
 {
-	std::cout << "var: " << varName;
+	std::cout << "var: " << name;
 }
 
 IntegerNode::IntegerNode( long* val ) :
@@ -157,13 +172,14 @@ void ListNode::printExpressionValue() const
 
 IndexNode::IndexNode( Cedomp::Type::TypeCode type, std::string varName,
 		ExpressionNode* index ) :
-		ExpressionNode(type), varName(varName), index(index)
+		ExpressionNode(type), index(index)
 {
+	setName(varName);
 
 }
 void IndexNode::printExpressionValue() const
 {
-	std::cout << "{" << varName << "[";
+	std::cout << "{" << name << "[";
 	index->printNode();
 	std::cout << "]" << "}";
 }
@@ -406,12 +422,42 @@ void LenNode::printOpName() const
 }
 
 FunctionExpressionNode::FunctionExpressionNode( std::string id ) :
-		ExpressionNode(Cedomp::Type::TYPEFUNCTION), id(id)
+		ExpressionNode(Cedomp::Type::TYPEFUNCTION)
 {
-
+	setName(id);
 }
 void FunctionExpressionNode::printExpressionValue() const
 {
-	std::cout << "func id: " << id;
+	std::cout << "func id: " << name;
 }
 
+FunctionCallNode::FunctionCallNode( std::string funcName, Type::TypeCode type ) :
+		ExpressionNode(type)
+{
+	setName(funcName);
+}
+void FunctionCallNode::printExpressionValue() const
+{
+	std::cout << name << "(";
+	for (auto& param : params)
+	{
+		param->printNode();
+	}
+	std::cout << ")";
+
+}
+
+FunctionCallNode::FunctionCallNode( std::string funcName, Type::TypeCode type,
+		std::vector<ExpressionNode*>* params ) :
+		ExpressionNode(type)
+{
+	setName(funcName);
+	if (params)
+	{
+		for (auto expr : (*params))
+		{
+			this->params.push_back(std::unique_ptr<ExpressionNode>(expr));
+		}
+		delete params;
+	}
+}

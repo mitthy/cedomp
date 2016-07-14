@@ -51,3 +51,17 @@ std::string RedeclarationOfFunction::Error()
 {
 	return "redeclaration of function " + id;
 }
+
+WrongNumberOfArguments::WrongNumberOfArguments( int expected, int actual ) :
+		expected(expected), actual(actual)
+{
+}
+
+std::string WrongNumberOfArguments::Error()
+{
+	std::string result = "wrong number of parameters: expected ";
+	result += std::to_string(expected);
+	result += " was given ";
+	result += std::to_string(actual);
+	return result;
+}

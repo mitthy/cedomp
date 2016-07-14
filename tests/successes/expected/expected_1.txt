@@ -1,0 +1,26 @@
+assigning var {type:integer} int1 = {integer: 2}
+assigning var {type:integer} int2 = {integer: 5}
+assigning var {type:float} float1 = {float: 0.2}
+assigning var {type:float} float2 = {float: 2}
+assigning var {type:float} float3 = {float: 4.5}
+assigning var {type:string} str3 = {string: Teste do str3}
+assigning var {type:string} str2 = {string: Ola mundo 
+ estou 	 vivo}
+assigning var {type:string} str1 = {string: Teste da str1}
+assigning var {type:bool} bool1 = {bool: true}
+assigning var {type:bool} bool2 = {bool: true}
+assigning var {type:map:integer} map1 = {map: new map}
+assigning var {type:map:integer} map1[{string: a}] = {integer: 1}
+assigning var {type:map:integer} map1[{string: abacate}] = {integer: 3}
+assigning var {type:map:integer} map1[{string: var: str1}] = (integer) {float: var: float3}
+assigning var {type:list:string} list1 = {list: new list}
+assigning var {type:list:string} list1[{integer: 0}] = {string: dado}
+assigning var {type:list:string} list2 = {list: new list}
+assigning var {type:list:string} list2 = {list:string: {list: var: list2} + {string: str}}
+assigning var {type:bool} bool1 = {bool: var: bool2}
+assigning var {type:string} str1 = {string: var: str2}
+assigning var {type:integer} int1 = {integer: var: int2}
+assigning var {type:integer} int1 = (integer) {float: var: float1}
+assigning var {type:float} float3 = {float: var: float2}
+assigning var {type:float} float2 = (float) {integer: var: int2}
+assigning var {type:list:string} list1 = {list:string: var: list2}

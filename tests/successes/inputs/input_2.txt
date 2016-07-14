@@ -1,0 +1,39 @@
+# Testes voltados pra o map
+
+map1 = map()
+map2 = map()
+map3 = map()
+
+map1["kk"] = 3
+i = "string"
+map1[i] = 4
+map1['0'] = 5
+
+map1["kk"] = map1[i]
+map1["kk"] != map1[i]
+
+
+# Testes voltados a lista
+
+list1 = list()
+list2 = list()
+list3 = list()
+listB1 = list()
+
+list1[0] = 3
+list1[1] = 5.2
+
+list1[1] = list1[0]
+list2[0] = list1[1]
+
+list3[0] = list1[1] + list2[0]
+listB1[0] = list1[1] == list2[0]
+
+
+
+list1[0] = 1
+list1[1] = 2
+list1[0] = 1.1 + 3
+list2[0] = 3.5
+list2[1] = 3.3
+list2[1] = 2 + 2.5

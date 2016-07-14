@@ -20,11 +20,14 @@ namespace Cedomp
 	namespace Scope
 	{
 
+		struct functionInfo;
+
 		struct variableInfo
 		{
 			Type::TypeCode type;
 			Type::TypeCode genericType;
 			bool globalScope;
+			functionInfo* pointerToFunc;
 			variableInfo();
 		};
 
@@ -34,6 +37,7 @@ namespace Cedomp
 			Type::TypeCode type;
 			Type::TypeCode genericType;
 			std::vector<std::shared_ptr<AST::ExpressionNode>> argInfo;
+			std::string name;
 		};
 
 		class ScopeNode

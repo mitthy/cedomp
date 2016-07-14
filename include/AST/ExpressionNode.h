@@ -27,10 +27,13 @@ namespace Cedomp
 			Type::TypeCode getGenericTypeCode() const;
 			Type::TypeCode getCoercionTypeCode() const;
 			Type::TypeCode getCoercionGenericTypeCode() const;
+			std::string getName();
+			void setName( const std::string& name );
 			void setGenericTypeCode( Type::TypeCode generic );
 			void setCoercion( Type::TypeCode type, Type::TypeCode genericType );
 			virtual void printNode() const;
 		protected:
+			std::string name;
 			Type::TypeCode type;
 			Type::TypeCode genericTypeCode;
 			Type::TypeCode coercionType;
@@ -44,8 +47,6 @@ namespace Cedomp
 			VariableNode( std::string name, Type::TypeCode type );
 		protected:
 			virtual void printExpressionValue() const;
-		private:
-			std::string varName;
 		};
 
 		class IntegerNode: public ExpressionNode
@@ -117,7 +118,6 @@ namespace Cedomp
 			virtual void printExpressionValue() const;
 		private:
 			std::unique_ptr<ExpressionNode> index;
-			std::string varName;
 		};
 
 		class BinaryOperationNode: public ExpressionNode
@@ -306,10 +306,20 @@ namespace Cedomp
 		class FunctionExpressionNode: public ExpressionNode
 		{
 		public:
-			FunctionExpressionNode(std::string id);
+			FunctionExpressionNode( std::string id );
 			virtual void printExpressionValue() const;
+		};
+
+		//TODO
+		class FunctionCallNode: public ExpressionNode
+		{
+		public:
+			FunctionCallNode( std::string funcName, Type::TypeCode type );
+			FunctionCallNode( std::string funcName, Type::TypeCode type,
+					std::vector<ExpressionNode*>* params );
+			void printExpressionValue() const;
 		private:
-			std::string id;
+			std::vector<std::unique_ptr<ExpressionNode>> params;
 		};
 
 	}

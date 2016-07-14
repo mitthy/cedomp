@@ -204,6 +204,16 @@ std::vector<AssignVariableNode*>* Cedomp::Semantic::AssignVariable(
 			VarScope::getScope().addToScope(idBeg->varName,
 					(*valBeg)->getTypeCode());
 		}
+		//If its a function, we should fix the pointer. Ideally, both should be the same and just point
+		//to some generic values.
+		if((*valBeg)->getTypeCode() == Cedomp::Type::TYPEFUNCTION)
+		{
+			//Ideally each expression would hold its own value and then it would be a piece of cake.
+			//But since we are out of time, this way is better
+			auto searchName = (*valBeg)->getName();
+			auto functionNode = Cedomp::Scope::FunctionScope::getScope().searchScope(searchName);
+			VarScope::getScope().searchScope(idBeg->varName)->pointerToFunc = functionNode;
+		}
 		//THIS IS NOT EXCEPTION SAFE. SHOULD BE CHANGED ASAP
 		if (idBeg->index)
 		{

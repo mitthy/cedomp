@@ -44,6 +44,7 @@
     Cedomp::AST::BlockNode* typedeclfuntail;
     Cedomp::AST::BlockNode* typefuncbody;
     std::vector<Cedomp::AST::ExpressionNode*>* typearglist;
+    Cedomp::AST::ExpressionNode* typefunctioncall;
 }
 
 %token T_NL
@@ -51,7 +52,7 @@
 %token T_MAP T_LIST T_TRUE T_FALSE T_STRING T_ID T_INT T_FLOAT
 %token T_DEF T_END T_RETURN T_FOR T_IF T_ELSE
 %token T_AND T_XOR T_OR T_MOD T_NOT T_EQUALS T_DIFFERENT T_GREATER_EQUAL T_LESS_EQUAL T_GREATER T_LESS T_PLUS T_STAR T_SLASH T_MINUS T_LEN
-
+%type<typefunctioncall> functioncall
 %type<typearglist> arglist
 %type<typefuncbody> funcbody
 %type<typedeclfuntail> declfuntail
@@ -1055,20 +1056,84 @@ functioncall
 functioncall:
 T_ID T_LEFT_PAR arglist T_RIGHT_PAR
 {
+    if($1 == nullptr || $3 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::CheckParameters($1, $3);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 |
 T_ID T_LEFT_PAR T_RIGHT_PAR
 {
+    if($1 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::CheckParameters($1);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 ;
 
 arglist:
 arglist T_COMMA expr
 {
+    if($1 == nullptr || $3 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::PassParameters($1, $3);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 |
 expr
 {
+    if($1 == nullptr)
+    {
+        $$ = nullptr;
+    }
+    else
+    {
+        try
+        {
+            $$ = Cedomp::Semantic::PassParameters(nullptr, $1);
+        }
+        catch(Cedomp::Exceptions::CedompException& e)
+        {
+            $$ = nullptr;
+            e.PrintSemanticError();
+        }
+    }
 }
 ;
 

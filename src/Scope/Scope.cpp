@@ -19,6 +19,7 @@ variableInfo::variableInfo()
 	this->type = 0;
 	this->globalScope = false;
 	this->genericType = BaseType::TYPEGENERIC;
+	pointerToFunc = nullptr;
 
 }
 
@@ -266,6 +267,7 @@ void FunctionScopeNode::addToScope( const std::string& name,
 {
 	functionInfo info;
 	info.type = varType;
+	info.name = name;
 	functionValMap[name] = info;
 }
 FunctionScopeNode* FunctionScopeNode::previousNode()

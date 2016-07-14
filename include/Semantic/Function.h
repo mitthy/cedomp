@@ -36,6 +36,13 @@ namespace Cedomp
 
 		AST::ReturnNode* CheckReturnStatement( AST::ExpressionNode* expr );
 
+		std::vector<AST::ExpressionNode*>* PassParameters(
+				std::vector<AST::ExpressionNode*>* list,
+				AST::ExpressionNode* next );
+
+		AST::ExpressionNode* CheckParameters( char* id );
+
+		AST::ExpressionNode* CheckParameters( char* id, std::vector<AST::ExpressionNode*>* params );
 	}
 }
 
