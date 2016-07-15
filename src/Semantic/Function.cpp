@@ -53,14 +53,6 @@ FunctionNode* Cedomp::Semantic::CreateFunction( FunctionInfo* functionInfo,
 	auto& funcScope = Cedomp::Scope::FunctionScope::getScope();
 	auto functionSymbol = funcScope.searchScope(functionInfo->name);
 	functionSymbol->defined = true;
-	if (functionInfo->args)
-	{
-		for (auto& element : (*(functionInfo->args)))
-		{
-			std::shared_ptr<ExpressionNode> toAdd(element);
-			functionSymbol->argInfo.push_back(toAdd);
-		}
-	}
 	functionSymbol->type = Cedomp::Type::TYPEDYNAMIC;
 	functionSymbol->genericType = Cedomp::Type::TYPEDYNAMIC;
 	return new FunctionNode(functionInfo->name, functionInfo->args,
@@ -100,6 +92,12 @@ FunctionInfo* Cedomp::Semantic::AddFunctionToScope( char* name,
 		throw Cedomp::Exceptions::RedeclarationOfFunction(id);
 	}
 	scope.addToScope(id, Cedomp::Type::TYPEDYNAMIC);
+	auto functionSymbol = scope.searchScope(id);
+	for (auto& element : (*args))
+	{
+		std::shared_ptr<ExpressionNode> toAdd(element);
+		functionSymbol->argInfo.push_back(toAdd);
+	}
 	FunctionInfo* ret = new FunctionInfo();
 	ret->args = args;
 	ret->name = id;
@@ -194,6 +192,13 @@ ExpressionNode* Cedomp::Semantic::CheckParameters( char* id )
 		{
 			throw Cedomp::Exceptions::UnaryOperationNotSupported("()",
 					varNode->type);
+		}
+		if (varNode->type == Cedomp::Type::TYPEDYNAMIC)
+		{
+			ExpressionNode* ret = new FunctionCallNode(funcName,
+					Cedomp::Type::TYPEDYNAMIC);
+			ret->setGenericTypeCode(Cedomp::Type::TYPEDYNAMIC);
+			return ret;
 		}
 		val = varNode->pointerToFunc;
 		if (!val)
@@ -317,6 +322,13 @@ ExpressionNode* Cedomp::Semantic::CheckParameters( char* id,
 		{
 			throw Cedomp::Exceptions::UnaryOperationNotSupported("()",
 					varNode->type);
+		}
+		if (varNode->type == Cedomp::Type::TYPEDYNAMIC)
+		{
+			ExpressionNode* ret = new FunctionCallNode(funcName,
+					Cedomp::Type::TYPEDYNAMIC, params);
+			ret->setGenericTypeCode(Cedomp::Type::TYPEDYNAMIC);
+			return ret;
 		}
 		val = varNode->pointerToFunc;
 		if (!val)
